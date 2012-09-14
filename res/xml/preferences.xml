@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:defaultValue="/mnt/sdcard/Audiobooks"
+        android:key="pref_base_dir"
+        android:summary="@string/pref_base_dir_summary"
+        android:title="@string/pref_base_dir" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_autoplay"
+        android:summary="@string/pref_autoplay_summary"
+        android:title="@string/pref_autoplay" />
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_create_nomedia"
+        android:title="@string/pref_exclude_audiobook_files" 
+        android:summary="@string/pref_exclude_audiobook_files_summary"/>
+
+</PreferenceScreen>

@@ -1,0 +1,33 @@
+<resources>
+
+    <string name="app_name">InEar</string>
+    <string name="title_activity_main">InEar</string>
+    <string name="title_activity_play">PlayActivity</string>
+    
+    <string name="no_way_back">Kein zurück mehr!!!</string>
+    <string name="no_databasemanager">Keine Datenbank verfügbar, kann Lesezeichen nicht speichern</string>
+    <string name="no_audiobooks_found">Es wurden keine Hörbücher gefunden in</string>
+
+	<string name="last_played">Last Played</string>
+    <string name="current_track_placeholder">current track</string>
+
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_playlist">Playlist</string>
+    
+    <string name="pref_base_dir">Hörbuch Verzeichnis</string>
+    <string name="pref_base_dir_summary">Das Verzeichnis in der die App nach Hörbüchern suchen soll.</string>
+    <string name="pref_base_dir_default">/sdcard/Audiobooks</string>
+    
+    <string name="pref_autoplay">Automatisches Abspielen</string>
+    <string name="pref_autoplay_summary">Automatisches Abspielen beim öffnen eines Hörbuchs.</string>
+    
+    <string name="pref_exclude_audiobook_files">Vom Medienscan ausnehmen</string>
+    <string name="pref_exclude_audiobook_files_summary">Erfasste Hörbuch Dateien vom Medienscan ausnehmen, sie erscheinen somit nicht mehr in anderen Media Playern.</string>
+
+	<string name="content_desc_previous_track">vorheriger Titel</string>
+    <string name="content_desc_play_button">play button</string>
+    <string name="content_desc_next_track">nächster Titel</string>
+    
+    <string name="notification_title">InEar läuft</string>
+    
+</resources>
