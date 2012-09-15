@@ -71,8 +71,6 @@ public class PlaybackService extends Service {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else {
-			System.err.println("it is NOT a new one");
 		}
 
 		return super.onStartCommand(intent, flags, startId);
