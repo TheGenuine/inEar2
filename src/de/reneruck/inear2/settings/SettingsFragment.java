@@ -1,9 +1,8 @@
 package de.reneruck.inear2.settings;
 
-import de.reneruck.inear2.R;
-import de.reneruck.inear2.R.xml;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import de.reneruck.inear2.R;
 
 public class SettingsFragment extends PreferenceFragment {
    

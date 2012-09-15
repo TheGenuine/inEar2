@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import de.reneruck.inear2.db.DatabaseManager;
 import de.reneruck.inear2.file.FileScanner;
+import de.reneruck.inear2.service.PlaybackService;
 
 
 public class AppContext extends Application {
