@@ -121,7 +121,7 @@ public class PlayActivity extends Activity{
 
 		@Override
 		public void onClick(View v) {
-			sendCommand(PlaybackService.ACTION_NEXT);
+			playbackServiceHandler.play_pause();
 		}
 	};
 
@@ -129,10 +129,9 @@ public class PlayActivity extends Activity{
 
 		@Override
 		public void onClick(View v) {
-			sendCommand(PlaybackService.ACTION_PLAY_PAUSE);
+			playbackServiceHandler.play_pause();
 			setPlaybackControlIcon();
 		}
-
 
 	};
 	
