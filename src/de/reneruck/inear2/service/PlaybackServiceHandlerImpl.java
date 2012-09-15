@@ -75,8 +75,7 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 
 	@Override
 	public int getDuration() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.service.getDuration();
 	}
 
 	public BroadcastReceiver getBroadcastHandler() {
