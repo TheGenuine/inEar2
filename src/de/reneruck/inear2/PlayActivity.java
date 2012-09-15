@@ -44,7 +44,6 @@ public class PlayActivity extends Activity{
 		super.onResume();
 		Log.d(TAG, "-- OnResume --");
 
-		initializePlayControl();
 		startAndBindToService();
 	}
 
@@ -78,6 +77,7 @@ public class PlayActivity extends Activity{
 			{
 				playbackServiceHandler = (PlaybackServiceHandler) service;
 				isBound = true;
+				initializePlayControl();
 				setSeekbarMaxValue();
 				setDurationIndicator();
 				setCurrentPlaytimeIndicator(playbackServiceHandler.getCurrentPlaybackPosition());
@@ -137,7 +137,7 @@ public class PlayActivity extends Activity{
 	};
 	
 	private void setPlaybackControlIcon() {
-		if (!this.playbackServiceHandler.isPlaying()) {
+		if (this.playbackServiceHandler.isPlaying()) {
 			((ImageView) findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_pause);
 		} else {
 			((ImageView) findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_play);
