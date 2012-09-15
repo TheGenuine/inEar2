@@ -1,13 +1,10 @@
-package de.reneruck.inear2;
+package de.reneruck.inear2.service;
 
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.drm.DrmStore.Action;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Handler;
@@ -15,13 +12,17 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
+import de.reneruck.inear2.AppContext;
+import de.reneruck.inear2.CurrentAudiobook;
+import de.reneruck.inear2.PlayActivity;
+import de.reneruck.inear2.R;
 
 public class PlaybackService extends Service {
 	
 	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
 	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
 	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
-
+	
 	private static final String TAG = "InEar - PlaybackService";
 	
 	private static final int play_pause = 1;
@@ -35,7 +36,7 @@ public class PlaybackService extends Service {
 	
 	private int boundEntities = 0;
 	private CurrentAudiobook bean;
-	private MyBinder binder;
+	private PlaybackServiceHandlerImpl binder;
 	private boolean foreground = false;
 	
 	@Override
@@ -44,7 +45,15 @@ public class PlaybackService extends Service {
 		this.mediaPlayer = new MediaPlayer();
 		this.appContext = (AppContext)getApplicationContext();
 		initNotification();
-		this.binder = new MyBinder();
+		
+		this.binder = new PlaybackServiceHandlerImpl(this);
+		
+		IntentFilter commandFilter = new IntentFilter();
+		commandFilter.addAction(ACTION_PLAY_PAUSE);
+		commandFilter.addAction(ACTION_NEXT);
+		commandFilter.addAction(ACTION_PREVIOUS);
+		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
+		
 		super.onCreate();
 	}
 	
@@ -62,12 +71,6 @@ public class PlaybackService extends Service {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	
-	        IntentFilter commandFilter = new IntentFilter();
-	        commandFilter.addAction(ACTION_PLAY_PAUSE);
-	        commandFilter.addAction(ACTION_NEXT);
-	        commandFilter.addAction(ACTION_PREVIOUS);
-	        registerReceiver(receiver, commandFilter);
 		}
 
 		return super.onStartCommand(intent, flags, startId);
@@ -96,29 +99,7 @@ public class PlaybackService extends Service {
 		};
 	};
 	
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-
-			if (ACTION_PLAY_PAUSE.equals(action)) {
-				Log.d(TAG, "Received Play pause action");
-				if (mediaPlayer.isPlaying()) {
-					pause();
-				} else {
-					play();
-				}
-			} else if (ACTION_NEXT.equals(action)) {
-				Log.d(TAG, "Next Track called");
-			} else if (ACTION_PREVIOUS.equals(action))
-				Log.d(TAG, "Previous Track called");
-			{
-			}
-		}
-	};
-	
-	private void pause() {
+	public void pause() {
 		if (this.boundEntities > 0) {
 			mediaPlayer.pause();
 		} else {
@@ -126,7 +107,7 @@ public class PlaybackService extends Service {
 		}
 	}
 	
-	private void play() {
+	public void play() {
 		if(this.mediaPlayer != null) {
 			this.mediaPlayer.start();
 		}
@@ -134,9 +115,27 @@ public class PlaybackService extends Service {
 
 	public boolean isPlaying() {
 		if(this.mediaPlayer != null) {
-			return this.isPlaying();
+			return this.mediaPlayer.isPlaying();
 		} else {
 			return false;
+		}
+	}
+	
+	public void previous() {
+		if(this.bean != null)
+		{
+			this.bean.setPreviousTrack();
+		} else {
+			Log.e(TAG, "No valid audiobook bean available");
+		}
+	}
+	
+	public void next() {
+		if(this.bean != null)
+		{
+			this.bean.setNextTrack();
+		} else {
+			Log.e(TAG, "No valid audiobook bean available");
 		}
 	}
 	
@@ -192,7 +191,7 @@ public class PlaybackService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.d(TAG, "-- onDestroy --");
-		unregisterReceiver(receiver);
+		unregisterReceiver(this.binder.getBroadcastHandler());
 		this.mediaPlayer.release();
 		this.mediaPlayer = null;
 		super.onDestroy();
@@ -220,6 +219,24 @@ public class PlaybackService extends Service {
 		super.onRebind(intent);
 	}
 	
+	public int getCurrentPlaybackPosition() {
+		if(this.mediaPlayer != null)
+		{
+			return this.mediaPlayer.getCurrentPosition();
+		} else {
+			return 0;
+		}
+	}
+	
+	public int getDuration() {
+		if(this.mediaPlayer != null)
+		{
+			return this.mediaPlayer.getDuration();
+		} else {
+			return 0;
+		}
+	}
+	
 	@Override
 	public boolean onUnbind(Intent intent) {
 		Log.d(TAG, "-- onDestroy --");
@@ -242,4 +259,6 @@ public class PlaybackService extends Service {
             return PlaybackService.this;
         }
 	}
+
+	
 }

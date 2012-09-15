@@ -26,6 +26,6 @@
             android:label="@string/title_activity_play" >
         </activity>
         <activity android:name=".settings.SettingsActivity"></activity>
-        <service android:name=".PlaybackService"></service>
+        <service android:name=".service.PlaybackService"></service>
     </application>
 </manifest>

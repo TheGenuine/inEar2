@@ -15,15 +15,17 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import de.reneruck.inear2.PlaybackService.MyBinder;
+import android.widget.TextView;
+import de.reneruck.inear2.service.PlaybackService;
+import de.reneruck.inear2.service.PlaybackServiceHandler;
 
 public class PlayActivity extends Activity{
 
 	private static final String TAG = "InEar - PlayActivity";
 	private AppContext appContext;
-	private boolean bound;
+	private boolean isBound;
 	private SeekBar seekbar;
-	private PlaybackService playbackService;
+	private PlaybackServiceHandler playbackServiceHandler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +55,7 @@ public class PlayActivity extends Activity{
     	ImageView bottonPlay = (ImageView) findViewById(R.id.button_play);
     	bottonPlay.setOnClickListener(this.playButtonClickListener);
 
-    	if(this.bound)
-    	{
-			((ImageView)findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_pause);
-
-    	} else {
-			((ImageView)findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_play);
-    	}
+    	setPlaybackControlIcon();
 
     	ImageView bottonPrev = (ImageView) findViewById(R.id.button_prev);
     	bottonPrev.setOnClickListener(this.prevButtonClickListener);
@@ -72,19 +68,48 @@ public class PlayActivity extends Activity{
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			Log.d(TAG, "-- serviceDisconnected --");
-			bound = false;
-			playbackService = null;
+			isBound = false;
+			playbackServiceHandler = null;
 		}
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.d(TAG, "-- serviceConnected --");
-			if(service != null && service instanceof MyBinder)
+			if(service != null && service instanceof PlaybackServiceHandler)
 			{
-				playbackService = ((MyBinder)service).getService();
+				playbackServiceHandler = (PlaybackServiceHandler) service;
+				isBound = true;
+				setSeekbarMaxValue();
+				setDurationIndicator();
+				setCurrentPlaytimeIndicator(playbackServiceHandler.getCurrentPlaybackPosition());
 			}
-			bound = true;
 		}
 	};
+	
+	private void setSeekbarMaxValue() {
+		this.seekbar.setMax(this.playbackServiceHandler.getDuration());
+	}
+	
+	private void setCurrentPlaytimeIndicator(int progress) {
+		TextView currentTimeField = (TextView)findViewById(R.id.playback_current_time);
+		int seconds = (int) (progress / 1000) % 60 ;
+		int minutes = (int) ((progress / (1000*60)) % 60);	
+		String secoundsString = seconds < 10 ? "0" + seconds : String.valueOf(seconds);
+		String durationText = minutes + ":" + secoundsString;
+		currentTimeField.setText(durationText);
+	}
+	
+	private void setDurationIndicator() {
+		if(this.isBound)
+		{
+			int duration = this.playbackServiceHandler.getDuration();
+			TextView durationField = (TextView)findViewById(R.id.playback_max_time);
+			int seconds = (int) (duration / 1000) % 60 ;
+			int minutes = (int) ((duration / (1000*60)) % 60);		
+			String secoundsString = seconds < 10 ? "0" + seconds : String.valueOf(seconds);
+			String durationText = minutes + ":" + secoundsString;
+			durationField.setText(durationText);
+		}
+	}
 	
 	private void startAndBindToService() {
 		Intent serviceIntent = new Intent(appContext, PlaybackService.class);
@@ -105,9 +130,20 @@ public class PlayActivity extends Activity{
 		@Override
 		public void onClick(View v) {
 			sendCommand(PlaybackService.ACTION_PLAY_PAUSE);
+			setPlaybackControlIcon();
 		}
-	};
 
+
+	};
+	
+	private void setPlaybackControlIcon() {
+		if (!this.playbackServiceHandler.isPlaying()) {
+			((ImageView) findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_pause);
+		} else {
+			((ImageView) findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_play);
+		}
+	}
+	
 	private OnClickListener prevButtonClickListener = new OnClickListener() {
 
 		@Override
@@ -164,7 +200,7 @@ public class PlayActivity extends Activity{
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if(this.bound) {
+		if(this.isBound) {
 			unbindService(this.serviceConnection);
 		}
 	};
