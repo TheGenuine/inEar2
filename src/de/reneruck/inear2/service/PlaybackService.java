@@ -64,16 +64,19 @@ public class PlaybackService extends Service {
 			System.err.println("it is a new Audiobook");
 			
 			this.bean = this.appContext.getCurrentAudiobookBean();
-			
-			try {
-				this.mediaPlayer.setDataSource(bean.getPlaylist().get(0));
-				this.mediaPlayer.prepare();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			prepareMediaplayerToCurrentTrack();
 		}
 
 		return super.onStartCommand(intent, flags, startId);
+	}
+
+	private void prepareMediaplayerToCurrentTrack() {
+		try {
+			this.mediaPlayer.setDataSource(this.bean.getPlaylist().get(this.bean.getCurrentTrack()));
+			this.mediaPlayer.prepare();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private boolean isNewAudiobook() {
