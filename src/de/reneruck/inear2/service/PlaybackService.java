@@ -60,8 +60,8 @@ public class PlaybackService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "-- onStartCommand --");
-
-		if(this.mediaPlayer != null && !this.mediaPlayer.isPlaying()) {
+		if(isNewAudiobook()) {
+			System.err.println("it is a new Audiobook");
 			
 			this.bean = this.appContext.getCurrentAudiobookBean();
 			
@@ -71,11 +71,21 @@ public class PlaybackService extends Service {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else {
+			System.err.println("it is NOT a new one");
 		}
 
 		return super.onStartCommand(intent, flags, startId);
 	}
 	
+	private boolean isNewAudiobook() {
+		if(this.bean == null) {
+			return true;
+		} else {
+			return !this.bean.equals(this.appContext.getCurrentAudiobookBean());
+		}
+	}
+
 	private Handler handler = new Handler() {
 
 		@Override
