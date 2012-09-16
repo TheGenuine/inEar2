@@ -69,8 +69,7 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 
 	@Override
 	public int getCurrentPlaybackPosition() {
-		// TODO Auto-generated method stub
-		return 0;
+		return service.getCurrentPlaybackPosition();
 	}
 
 	@Override
@@ -80,5 +79,10 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 
 	public BroadcastReceiver getBroadcastHandler() {
 		return this.broadcastHandler;
+	}
+
+	@Override
+	public void setPlaybackPosition(int progress) {
+		this.service.seekTo(progress);
 	}
 }

@@ -158,6 +158,9 @@ public class PlaybackService extends Service {
 		
 		RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification_media_control);
 		this.notification.contentView = contentView;
+		this.notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		this.notification.flags |= Notification.FLAG_NO_CLEAR;
+		
 		setListeners();
 	}
 	
@@ -269,6 +272,13 @@ public class PlaybackService extends Service {
         public PlaybackService getService() {
             return PlaybackService.this;
         }
+	}
+
+	public void seekTo(int progress) {
+		if(this.mediaPlayer != null && progress > 0 && progress < this.mediaPlayer.getDuration())
+		{
+			this.mediaPlayer.seekTo(progress);
+		}
 	}
 
 	

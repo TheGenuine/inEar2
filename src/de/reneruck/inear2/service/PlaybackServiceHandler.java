@@ -10,4 +10,5 @@ public interface PlaybackServiceHandler {
 	public boolean isPlaying();
 	public int getCurrentPlaybackPosition();
 	public int getDuration();
+	public void setPlaybackPosition(int progress);
 }

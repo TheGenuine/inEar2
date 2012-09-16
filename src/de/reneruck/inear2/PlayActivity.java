@@ -24,9 +24,11 @@ public class PlayActivity extends Activity{
 	private static final String TAG = "InEar - PlayActivity";
 	private AppContext appContext;
 	private boolean isBound;
+	private boolean updaterThreadIsRunning = false;
 	private SeekBar seekbar;
 	private PlaybackServiceHandler playbackServiceHandler;
-
+	private Thread seekbarUpdaterThread;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,10 +82,36 @@ public class PlayActivity extends Activity{
 				initializePlayControl();
 				setSeekbarMaxValue();
 				setDurationIndicator();
-				setCurrentPlaytimeIndicator(playbackServiceHandler.getCurrentPlaybackPosition());
+				initSeekbarUpdaterThread();
 			}
 		}
 	};
+	
+	private void initSeekbarUpdaterThread() {
+		Log.d(TAG, "Initializing Seekbar Updater Thread");
+		this.seekbarUpdaterThread = new Thread(new Runnable() {
+			
+			
+			@Override
+			public void run() {
+				while(updaterThreadIsRunning)
+				{
+					if(isBound && playbackServiceHandler.isPlaying())
+					{
+						seekbar.setProgress(playbackServiceHandler.getCurrentPlaybackPosition());
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		this.updaterThreadIsRunning = true;
+		this.seekbarUpdaterThread.start();
+	}
+	
 	
 	private void setSeekbarMaxValue() {
 		this.seekbar.setMax(this.playbackServiceHandler.getDuration());
@@ -154,21 +182,26 @@ public class PlayActivity extends Activity{
 	private OnSeekBarChangeListener onSeekbarDragListener = new OnSeekBarChangeListener() {
 		
 		@Override
-		public void onStopTrackingTouch(SeekBar seekBar) {
-			// TODO Auto-generated method stub
-			
+		public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
+			seekbar.setProgress(progress);
+			setCurrentPlaytimeIndicator(progress);
 		}
-		
+
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {
-			// TODO Auto-generated method stub
-			
+			if(isBound)
+			{
+				playbackServiceHandler.play_pause();
+			}
 		}
-		
+
 		@Override
-		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			// TODO Auto-generated method stub
-			
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			if(isBound)
+			{
+				playbackServiceHandler.setPlaybackPosition(seekBar.getProgress());
+				playbackServiceHandler.play_pause();
+			}
 		}
 	};
 	
