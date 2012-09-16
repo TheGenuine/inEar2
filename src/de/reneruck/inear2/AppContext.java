@@ -52,7 +52,7 @@ public class AppContext extends Application {
 	}
 	
 	public void setCurrentAudiobook(String currentAudiobook) {
-		if(this.currentAudiobookBean == null || this.currentAudiobookBean.getName().equals(currentAudiobook))
+		if(this.currentAudiobookBean == null || !this.currentAudiobookBean.getName().equals(currentAudiobook))
 		{
 			this.currentAudiobookBean = this.audiobookBeanFactory.getAudiobookBeanForName(currentAudiobook);
 		} else {
