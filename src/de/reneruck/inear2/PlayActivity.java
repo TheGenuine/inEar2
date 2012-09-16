@@ -231,11 +231,6 @@ public class PlayActivity extends Activity{
 		return true;
 	}
 	
-	private void sendCommand(String action) {
-		Intent i = new Intent(action);
-		sendBroadcast(i);
-	}
-	
 	@Override
 	protected void onPause() {
 		super.onPause();
