@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,9 +16,10 @@ import android.widget.RemoteViews;
 import de.reneruck.inear2.AppContext;
 import de.reneruck.inear2.CurrentAudiobook;
 import de.reneruck.inear2.PlayActivity;
+import de.reneruck.inear2.PlaylistFinishedException;
 import de.reneruck.inear2.R;
 
-public class PlaybackService extends Service {
+public class PlaybackService extends Service implements OnCompletionListener {
 	
 	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
 	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
@@ -43,6 +45,7 @@ public class PlaybackService extends Service {
 	public void onCreate() {
 		Log.d(TAG, "-- onCreate --");
 		this.mediaPlayer = new MediaPlayer();
+		this.mediaPlayer.setOnCompletionListener(this);
 		this.appContext = (AppContext)getApplicationContext();
 		initNotification();
 		
@@ -72,6 +75,7 @@ public class PlaybackService extends Service {
 
 	private void prepareMediaplayerToCurrentTrack() {
 		try {
+			this.mediaPlayer.reset();
 			this.mediaPlayer.setDataSource(this.bean.getPlaylist().get(this.bean.getCurrentTrack()));
 			this.mediaPlayer.prepare();
 		} catch (Exception e) {
@@ -132,19 +136,25 @@ public class PlaybackService extends Service {
 		}
 	}
 	
-	public void previous() {
+	public void previous() throws PlaylistFinishedException {
 		if(this.bean != null)
 		{
 			this.bean.setPreviousTrack();
+			boolean wasPlaying = this.mediaPlayer.isPlaying();
+			prepareMediaplayerToCurrentTrack();
+			if(wasPlaying) play();
 		} else {
 			Log.e(TAG, "No valid audiobook bean available");
 		}
 	}
 	
-	public void next() {
+	public void next() throws PlaylistFinishedException {
 		if(this.bean != null)
 		{
 			this.bean.setNextTrack();
+			boolean wasPlaying = this.mediaPlayer.isPlaying();
+			prepareMediaplayerToCurrentTrack();
+			if(wasPlaying) play();
 		} else {
 			Log.e(TAG, "No valid audiobook bean available");
 		}
@@ -278,6 +288,18 @@ public class PlaybackService extends Service {
 		if(this.mediaPlayer != null && progress > 0 && progress < this.mediaPlayer.getDuration())
 		{
 			this.mediaPlayer.seekTo(progress);
+		}
+	}
+
+	@Override
+	public void onCompletion(MediaPlayer mediaPlayer) {
+		Log.d(TAG, "Track finished");
+		try {
+			next();
+		} catch (PlaylistFinishedException e) {
+			Log.d(TAG, "End of Playlist reached");
+			this.bean.setCurrentTrack(0);
+			prepareMediaplayerToCurrentTrack();
 		}
 	}
 

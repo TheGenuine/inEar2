@@ -4,6 +4,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.List;
 
+import de.reneruck.inear2.file.FileScanner;
+
 public class CurrentAudiobook {
 
 	private String name;
@@ -53,19 +55,31 @@ public class CurrentAudiobook {
 		this.bookmark = bookmark;
 	}
 
-	public void setPreviousTrack() {
+	public void setPreviousTrack() throws PlaylistFinishedException {
 		if (this.track - 1 >= 0) {
 			int oldtrack = this.track;
 			this.track--;
-			this.changes.firePropertyChange("track", oldtrack, this.track);
+			if(this.playlist.get(this.track).equals(FileScanner.END_OF_CD)) {
+				setPreviousTrack();
+			} else {
+				this.changes.firePropertyChange("track", oldtrack, this.track);
+			}
+		} else {
+			throw new PlaylistFinishedException();
 		}
 	}
 
-	public void setNextTrack() {
+	public void setNextTrack() throws PlaylistFinishedException {
 		if (this.track + 1 <= this.playlist.size()-1) {
 			int oldtrack = this.track;
 			this.track++;
-			this.changes.firePropertyChange("track", oldtrack, this.track);
+			if(this.playlist.get(this.track).equals(FileScanner.END_OF_CD)) {
+				setNextTrack();
+			} else {
+				this.changes.firePropertyChange("track", oldtrack, this.track);
+			}
+		} else {
+			throw new PlaylistFinishedException();
 		}
 	}
 

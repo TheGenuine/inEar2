@@ -29,4 +29,6 @@
     <string name="content_desc_next_track">next track</string>
     
     <string name="notification_title">InEar is playing</string>
+    
+    <string name="toast_audiobook_is_finished">Audiobook is finished</string>
 </resources>

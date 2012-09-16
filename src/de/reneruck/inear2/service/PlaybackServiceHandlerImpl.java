@@ -2,11 +2,15 @@ package de.reneruck.inear2.service;
 
 import java.security.InvalidParameterException;
 
+import de.reneruck.inear2.PlaylistFinishedException;
+import de.reneruck.inear2.R;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.util.Log;
+import android.widget.Toast;
 
 public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServiceHandler {
 
@@ -35,10 +39,18 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 				play_pause();
 			} else if (PlaybackService.ACTION_NEXT.equals(action)) {
 				Log.d(TAG, "Next Track called");
-				next();
+				try {
+					next();
+				} catch (PlaylistFinishedException e) {
+					Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
+				}
 			} else if (PlaybackService.ACTION_PREVIOUS.equals(action)) {
 				Log.d(TAG, "Previous Track called");
-				previous();
+				try {
+					previous();
+				} catch (PlaylistFinishedException e) {
+					Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
 	}
@@ -53,12 +65,12 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 	}
 
 	@Override
-	public void next() {
+	public void next() throws PlaylistFinishedException {
 		this.service.next();
 	}
 
 	@Override
-	public void previous() {
+	public void previous() throws PlaylistFinishedException {
 		this.service.previous();
 	}
 

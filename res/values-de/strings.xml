@@ -30,4 +30,6 @@
     
     <string name="notification_title">InEar läuft</string>
     
+        <string name="toast_audiobook_is_finished">Hörbuch zu Ende</string>
+    
 </resources>

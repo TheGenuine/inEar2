@@ -91,12 +91,11 @@ public class PlayActivity extends Activity{
 		Log.d(TAG, "Initializing Seekbar Updater Thread");
 		this.seekbarUpdaterThread = new Thread(new Runnable() {
 			
-			
 			@Override
 			public void run() {
 				while(isSeekbarUpdaterThreadRunning)
 				{
-					if(isBound && playbackServiceHandler.isPlaying())
+					if(isBound)
 					{
 						seekbar.setProgress(playbackServiceHandler.getCurrentPlaybackPosition());
 					}
@@ -149,7 +148,11 @@ public class PlayActivity extends Activity{
 
 		@Override
 		public void onClick(View v) {
-			playbackServiceHandler.play_pause();
+			try {
+				playbackServiceHandler.next();
+			} catch (PlaylistFinishedException e) {
+				Log.d(TAG, "End of Playlist reached");
+			}
 		}
 	};
 
@@ -175,7 +178,11 @@ public class PlayActivity extends Activity{
 
 		@Override
 		public void onClick(View v) {
-			sendCommand(PlaybackService.ACTION_PREVIOUS);
+			try {
+				playbackServiceHandler.previous();
+			} catch (PlaylistFinishedException e) {
+				Log.d(TAG, "End of Playlist reached");
+			}
 		}
 	};
 

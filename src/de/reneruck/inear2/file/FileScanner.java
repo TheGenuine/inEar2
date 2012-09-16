@@ -15,6 +15,8 @@ import de.reneruck.inear2.AppContext;
 
 public class FileScanner extends AsyncTask<Void, Void, Void> {
 
+	public static final String END_OF_CD = "endOfTheCD";
+
 	private AppContext appContext;
 	
 	public FileScanner(AppContext appContext) {
@@ -45,13 +47,24 @@ public class FileScanner extends AsyncTask<Void, Void, Void> {
 		File[] listFiles = audiobookDir.listFiles(dirFilter);
 		List<String> mediaFiles = new LinkedList<String>();
 		mediaFiles.addAll(getMediafiles(audiobookDir));
-		if(this.appContext.getSettings().isCreateNoMediaFile())createNoMediaFile(audiobookDir);
+		
+		if(this.appContext.getSettings().isCreateNoMediaFile()) createNoMediaFile(audiobookDir);
 		
 		for (File dir : listFiles) {
 			mediaFiles.addAll(getMediafiles(dir));
-			if(this.appContext.getSettings().isCreateNoMediaFile())createNoMediaFile(dir);
+			addEndOfCdTag(mediaFiles);
+			if(this.appContext.getSettings().isCreateNoMediaFile()) createNoMediaFile(dir);
 		}
+		removeLastEndOfCdTag(mediaFiles);
 		createAndWritePlaylist(audiobookDir, mediaFiles);
+	}
+
+	private void addEndOfCdTag(List<String> mediaFiles) {
+		mediaFiles.add(END_OF_CD);
+	}
+	
+	private void removeLastEndOfCdTag(List<String> mediaFiles) {
+		if(mediaFiles.get(mediaFiles.size()-1).equals(END_OF_CD)) mediaFiles.remove(mediaFiles.size() -1);
 	}
 
 	private void createNoMediaFile(File dir) {
