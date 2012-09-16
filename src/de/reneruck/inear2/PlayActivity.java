@@ -24,7 +24,7 @@ public class PlayActivity extends Activity{
 	private static final String TAG = "InEar - PlayActivity";
 	private AppContext appContext;
 	private boolean isBound;
-	private boolean updaterThreadIsRunning = false;
+	private boolean isSeekbarUpdaterThreadRunning = false;
 	private SeekBar seekbar;
 	private PlaybackServiceHandler playbackServiceHandler;
 	private Thread seekbarUpdaterThread;
@@ -94,7 +94,7 @@ public class PlayActivity extends Activity{
 			
 			@Override
 			public void run() {
-				while(updaterThreadIsRunning)
+				while(isSeekbarUpdaterThreadRunning)
 				{
 					if(isBound && playbackServiceHandler.isPlaying())
 					{
@@ -108,7 +108,7 @@ public class PlayActivity extends Activity{
 				}
 			}
 		});
-		this.updaterThreadIsRunning = true;
+		this.isSeekbarUpdaterThreadRunning = true;
 		this.seekbarUpdaterThread.start();
 	}
 	
@@ -235,5 +235,7 @@ public class PlayActivity extends Activity{
 		if(this.isBound) {
 			unbindService(this.serviceConnection);
 		}
+		this.isSeekbarUpdaterThreadRunning = false;
+		this.seekbarUpdaterThread = null;
 	};
 }
