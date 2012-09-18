@@ -14,6 +14,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
 import de.reneruck.inear2.AppContext;
+import de.reneruck.inear2.Bookmark;
 import de.reneruck.inear2.CurrentAudiobook;
 import de.reneruck.inear2.PlayActivity;
 import de.reneruck.inear2.PlaylistFinishedException;
@@ -67,13 +68,23 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "-- onStartCommand --");
 		if(isNewAudiobook()) {
-			System.err.println("it is a new Audiobook");
-			
 			this.bean = this.appContext.getCurrentAudiobookBean();
-			prepareMediaplayerToCurrentTrack();
+			if(!loadBookmark())  prepareMediaplayerToCurrentTrack();
 		}
 
 		return super.onStartCommand(intent, flags, startId);
+	}
+
+	private boolean loadBookmark() {
+		Bookmark bookmark = this.bean.getBookmark();
+		if(bookmark != null) {
+			Log.d(TAG, "Loading bookmark");
+			this.bean.setCurrentTrack(bookmark.getTrackNumber());
+			prepareMediaplayerToCurrentTrack();
+			this.mediaPlayer.seekTo(bookmark.getPlaybackPosition());
+			return true;
+		}
+		return false;
 	}
 
 	private void prepareMediaplayerToCurrentTrack() {
@@ -81,6 +92,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 			this.mediaPlayer.reset();
 			this.mediaPlayer.setDataSource(this.bean.getPlaylist().get(this.bean.getCurrentTrack()));
 			this.mediaPlayer.prepare();
+			this.mediaPlayer.seekTo(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
