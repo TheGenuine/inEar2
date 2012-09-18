@@ -13,12 +13,15 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
+import de.reneruck.inear2.db.AsyncStoreBookmark;
 import de.reneruck.inear2.AppContext;
 import de.reneruck.inear2.Bookmark;
 import de.reneruck.inear2.CurrentAudiobook;
 import de.reneruck.inear2.PlayActivity;
 import de.reneruck.inear2.PlaylistFinishedException;
 import de.reneruck.inear2.R;
+import de.reneruck.inear2.db.DatabaseManager;
 
 public class PlaybackService extends Service implements OnCompletionListener {
 	
@@ -130,6 +133,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	};
 	
 	public void pause() {
+		createOrUpdateBookmark();
 		if (this.boundEntities > 0) {
 			mediaPlayer.pause();
 		} else {
@@ -327,5 +331,28 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		}
 	}
 
-	
+	private void createOrUpdateBookmark() {
+		Log.d(TAG, "storing current track and playback position");
+		if(this.bean.getBookmark() != null)
+		{
+			this.bean.getBookmark().setTrackNumber(this.bean.getCurrentTrack());
+			this.bean.getBookmark().setPlaybackPosition(this.mediaPlayer.getCurrentPosition());
+		} else {
+			this.bean.setBookmark(new Bookmark(this.bean.getName(), this.bean.getCurrentTrack(), this.mediaPlayer.getCurrentPosition()));
+		}
+		storeBookmark();
+	}
+
+	private void storeBookmark() {
+		DatabaseManager databaseManager = this.appContext.getDatabaseManager();
+		if(databaseManager != null)
+		{
+			AsyncStoreBookmark storeBookmarkTask = new AsyncStoreBookmark(databaseManager);
+			storeBookmarkTask.doInBackground(this.bean.getBookmark());
+		} else {
+			String string = getString(R.string.no_databasemanager);
+			Toast.makeText(getApplicationContext(), string, Toast.LENGTH_LONG).show();
+			Log.e(TAG, string);
+		}
+	}
 }
