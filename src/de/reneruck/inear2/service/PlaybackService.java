@@ -3,10 +3,15 @@ package de.reneruck.inear2.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.RemoteControlClient;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,21 +19,21 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-import de.reneruck.inear2.db.AsyncStoreBookmark;
 import de.reneruck.inear2.AppContext;
 import de.reneruck.inear2.Bookmark;
 import de.reneruck.inear2.CurrentAudiobook;
 import de.reneruck.inear2.PlayActivity;
 import de.reneruck.inear2.PlaylistFinishedException;
 import de.reneruck.inear2.R;
+import de.reneruck.inear2.db.AsyncStoreBookmark;
 import de.reneruck.inear2.db.DatabaseManager;
 
 public class PlaybackService extends Service implements OnCompletionListener {
 	
-	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
-	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
-	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
-	public static final String ACTION_SET_TRACK = "de.reneruck.inear.action.set_track";
+//	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
+//	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
+//	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
+//	public static final String ACTION_SET_TRACK = "de.reneruck.inear.action.set_track";
 	public static final String ACTION_SET_TRACK_NR = "de.reneruck.inear.action.set_track.nr";
 	
 	private static final String TAG = "InEar - PlaybackService";
@@ -46,6 +51,8 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	private CurrentAudiobook bean;
 	private PlaybackServiceHandlerImpl binder;
 	private boolean foreground = false;
+	private ComponentName eventReceiver;
+	private RemoteControlClient rcClient;
 	
 	@Override
 	public void onCreate() {
@@ -57,12 +64,14 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		
 		this.binder = new PlaybackServiceHandlerImpl(this);
 		
-		IntentFilter commandFilter = new IntentFilter();
-		commandFilter.addAction(ACTION_PLAY_PAUSE);
-		commandFilter.addAction(ACTION_NEXT);
-		commandFilter.addAction(ACTION_PREVIOUS);
-		commandFilter.addAction(ACTION_SET_TRACK);
-		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
+//		IntentFilter commandFilter = new IntentFilter();
+//		commandFilter.addAction(ACTION_PLAY_PAUSE);
+//		commandFilter.addAction(ACTION_NEXT);
+//		commandFilter.addAction(ACTION_PREVIOUS);
+//		commandFilter.addAction(ACTION_SET_TRACK);
+//		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
+		
+		setupRemoteControlClient();
 		
 		super.onCreate();
 	}
@@ -74,10 +83,47 @@ public class PlaybackService extends Service implements OnCompletionListener {
 			this.bean = this.appContext.getCurrentAudiobookBean();
 			if(!loadBookmark())  prepareMediaplayerToCurrentTrack();
 		}
-
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	private void setupRemoteControlClient() {
+		Log.d(TAG, "Registering remoteControlClient");
+		this.eventReceiver = new ComponentName(getPackageName(), PlaybackServiceHandlerImpl.BroadcastHandler.class.getName());
+		
+		AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		audioManager.registerMediaButtonEventReceiver(this.eventReceiver);
+		
+		// build the PendingIntent for the remote control client
+		Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+		mediaButtonIntent.setComponent(this.eventReceiver);
+		PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent, 0);
+		
+		// create and register the remote control client
+		this.rcClient = new RemoteControlClient(mediaPendingIntent);
+		this.rcClient.setTransportControlFlags(
+				RemoteControlClient.FLAG_KEY_MEDIA_NEXT |
+				RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS |
+				RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
+				RemoteControlClient.FLAG_KEY_MEDIA_PAUSE);
+		this.rcClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
+		audioManager.registerRemoteControlClient(this.rcClient);
+	}
+	
+	private void updateMetadata() {
+        // Update the remote controls
+        this.rcClient.editMetadata(true)
+                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, this.bean.getCurrentTrackName())
+                .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
+                        this.mediaPlayer.getDuration())
+                .apply();
+	}
+	
+	private void unregisterRemoteControlClient() {
+		AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		audioManager.unregisterMediaButtonEventReceiver(this.eventReceiver);
+		audioManager.unregisterRemoteControlClient(this.rcClient);
+	}
+	
 	private boolean loadBookmark() {
 		Bookmark bookmark = this.bean.getBookmark();
 		if(bookmark != null) {
@@ -136,6 +182,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		createOrUpdateBookmark();
 		if (this.boundEntities > 0) {
 			mediaPlayer.pause();
+			this.rcClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
 		} else {
 			stopSelf();
 		}
@@ -144,6 +191,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public void play() {
 		if(this.mediaPlayer != null) {
 			this.mediaPlayer.start();
+			this.rcClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
 		}
 	}
 
@@ -218,10 +266,10 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	private void setListeners() {
 		RemoteViews contentView = this.notification.contentView;
 		
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_PLAY_PAUSE), 0);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(getString(R.string.intent_play_pause)), 0);
 		contentView.setOnClickPendingIntent(R.id.notification_button_play, pendingIntent);
 		
-		PendingIntent pendingIntentNext = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_NEXT), 0);
+		PendingIntent pendingIntentNext = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(getString(R.string.intent_next)), 0);
 		contentView.setOnClickPendingIntent(R.id.notification_button_next, pendingIntentNext);
 		
 		Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -234,6 +282,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public void onDestroy() {
 		Log.d(TAG, "-- onDestroy --");
 		unregisterReceiver(this.binder.getBroadcastHandler());
+		unregisterRemoteControlClient();
 		this.mediaPlayer.release();
 		this.mediaPlayer = null;
 		super.onDestroy();

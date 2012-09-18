@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intent_play_pause">de.reneruck.inear.action.play_pause</string>
+    <string name="intent_next">de.reneruck.inear.action.next</string>
+    <string name="intent_previous">de.reneruck.inear.action.previous</string>
+    <string name="intent_set_track">de.reneruck.inear.action.set_track</string>
+    
+</resources>

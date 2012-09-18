@@ -25,6 +25,13 @@
             android:name=".PlayActivity" >
         </activity>
         <activity android:name=".settings.SettingsActivity"></activity>
-        <service android:name=".service.PlaybackService"></service>
+        <service android:name=".service.PlaybackService">
+            <intent-filter>
+                <action android:name="@string/intent_play_pause"/>
+                <action android:name="@string/intent_next"/>
+                <action android:name="@string/intent_previous"/>
+                <action android:name="@string/intent_set_track"/>
+            </intent-filter>
+        </service>
     </application>
 </manifest>

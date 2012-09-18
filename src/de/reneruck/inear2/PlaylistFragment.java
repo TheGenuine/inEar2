@@ -51,7 +51,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
 			if(!"seperator".equals(view.getTag())){
-				Intent i = new Intent(PlaybackService.ACTION_SET_TRACK);
+				Intent i = new Intent(getString(R.string.intent_set_track));
 				i.putExtra(PlaybackService.ACTION_SET_TRACK_NR, pos);
 				appContext.sendBroadcast(i);
 			}
