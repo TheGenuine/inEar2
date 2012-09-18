@@ -189,6 +189,8 @@ public class PlayActivity extends Activity{
 
 	private OnSeekBarChangeListener onSeekbarDragListener = new OnSeekBarChangeListener() {
 		
+		private boolean wasPlaying;
+
 		@Override
 		public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
 			seekbar.setProgress(progress);
@@ -199,7 +201,11 @@ public class PlayActivity extends Activity{
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			if(isBound)
 			{
-				playbackServiceHandler.play_pause();
+				this.wasPlaying = playbackServiceHandler.isPlaying();
+				if(this.wasPlaying)
+				{
+					playbackServiceHandler.play_pause();
+				}
 			}
 		}
 
@@ -208,7 +214,10 @@ public class PlayActivity extends Activity{
 			if(isBound)
 			{
 				playbackServiceHandler.setPlaybackPosition(seekBar.getProgress());
-				playbackServiceHandler.play_pause();
+				if(this.wasPlaying)
+				{
+					playbackServiceHandler.play_pause();
+				}
 			}
 		}
 	};
