@@ -1,10 +1,10 @@
 <resources>
 
-    <string name="app_name">InEar</string>
+    <string name="app_name">InEar2</string>
     <string name="title_activity_main">InEar</string>
     <string name="title_activity_play">PlayActivity</string>
 
-    <string name="no_way_back">Kein zurück mehr!!!</string>
+    <string name="no_way_back">No way back !!!</string>
     <string name="no_databasemanager">No DatabaseManager available to store Boomark</string>
     <string name="no_audiobooks_found">No Audiobooks found in</string>
 
