@@ -70,7 +70,7 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 
 	@Override
 	public void next() throws PlaylistFinishedException {
-		this.service.next();
+		this.service.next(false);
 	}
 
 	@Override

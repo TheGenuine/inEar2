@@ -167,11 +167,10 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		}
 	}
 	
-	public void next() throws PlaylistFinishedException {
+	public void next(boolean wasPlaying) throws PlaylistFinishedException {
 		if(this.bean != null)
 		{
 			this.bean.setNextTrack();
-			boolean wasPlaying = this.mediaPlayer.isPlaying();
 			prepareMediaplayerToCurrentTrack();
 			if(wasPlaying) play();
 		} else {
@@ -314,7 +313,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public void onCompletion(MediaPlayer mediaPlayer) {
 		Log.d(TAG, "Track finished");
 		try {
-			next();
+			next(true);
 		} catch (PlaylistFinishedException e) {
 			Log.d(TAG, "End of Playlist reached");
 			this.bean.setCurrentTrack(0);
