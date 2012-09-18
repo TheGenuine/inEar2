@@ -213,7 +213,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		} else {
 			contentView.setImageViewResource(R.id.notification_button_play, android.R.drawable.ic_media_play);
 		}
-		contentView.setTextViewText(R.id.notification_current_track, this.bean.getCurrentTrackName());
+//		contentView.setTextViewText(R.id.notification_current_track, this.bean.getCurrentTrackName());
 	}
 	
 	private void setListeners() {
