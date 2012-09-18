@@ -51,6 +51,10 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 				} catch (PlaylistFinishedException e) {
 					Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
 				}
+			} else if (PlaybackService.ACTION_SET_TRACK.equals(action)) {
+				Log.d(TAG, "Set Track called");
+					int trackNr = intent.getIntExtra(PlaybackService.ACTION_SET_TRACK_NR, 0);
+					service.setTrack(trackNr);
 			}
 		}
 	}

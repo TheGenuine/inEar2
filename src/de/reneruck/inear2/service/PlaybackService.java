@@ -24,6 +24,8 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
 	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
 	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
+	public static final String ACTION_SET_TRACK = "de.reneruck.inear.action.set_track";
+	public static final String ACTION_SET_TRACK_NR = "de.reneruck.inear.action.set_track.nr";
 	
 	private static final String TAG = "InEar - PlaybackService";
 	
@@ -55,6 +57,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		commandFilter.addAction(ACTION_PLAY_PAUSE);
 		commandFilter.addAction(ACTION_NEXT);
 		commandFilter.addAction(ACTION_PREVIOUS);
+		commandFilter.addAction(ACTION_SET_TRACK);
 		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
 		
 		super.onCreate();
@@ -300,6 +303,15 @@ public class PlaybackService extends Service implements OnCompletionListener {
 			Log.d(TAG, "End of Playlist reached");
 			this.bean.setCurrentTrack(0);
 			prepareMediaplayerToCurrentTrack();
+		}
+	}
+
+	public void setTrack(int trackNr) {
+		boolean wasPlaying = isPlaying();
+		this.bean.setCurrentTrack(trackNr);
+		prepareMediaplayerToCurrentTrack();
+		if(wasPlaying) {
+			play();
 		}
 	}
 

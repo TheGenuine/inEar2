@@ -4,7 +4,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import de.reneruck.inear2.service.PlaybackService;
+
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +50,9 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
 			if(!"seperator".equals(view.getTag())){
-				appContext.getCurrentAudiobookBean().setCurrentTrack(pos);
+				Intent i = new Intent(PlaybackService.ACTION_SET_TRACK);
+				i.putExtra(PlaybackService.ACTION_SET_TRACK_NR, pos);
+				appContext.sendBroadcast(i);
 			}
 		}
 	};
