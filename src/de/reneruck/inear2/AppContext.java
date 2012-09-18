@@ -7,6 +7,7 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.reneruck.inear2.db.DatabaseManager;
@@ -32,6 +33,7 @@ public class AppContext extends Application {
 		this.databaseManager = new DatabaseManager(this);
 		
 		readSettings();
+		registerForPreferenceChange();
 		initAudiobookBeanFactory();
 	}
 	
@@ -44,6 +46,26 @@ public class AppContext extends Application {
 		this.audiobookBaseDir = sharedPref.getString("pref_base_dir", getString(R.string.pref_base_dir_default));
 		this.settings = new Settings(sharedPref);
 		runFilescanner();
+	}
+
+	private void registerForPreferenceChange() {
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		sharedPref.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+			
+			@Override
+			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+				if("pref_base_dir".equals(key)) {
+					audiobookBaseDir = sharedPreferences.getString("pref_base_dir", getString(R.string.pref_base_dir_default));
+					runFilescanner();
+				}
+				if("pref_autoplay".equals(key)) {
+					settings.setAutoplay(sharedPreferences.getBoolean("pref_autoplay", false));
+				}
+				if("pref_exclude_audiobook_files".equals(key)) {
+					settings.setCreateNoMediaFile(sharedPreferences.getBoolean("pref_exclude_audiobook_files", true));
+				}
+			}
+		});
 	}
 	
 	private void runFilescanner() {

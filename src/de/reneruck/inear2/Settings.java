@@ -18,5 +18,13 @@ public class Settings {
 	public boolean isAutoplay() {
 		return autoplay;
 	}
+
+	public void setAutoplay(boolean autoplay) {
+		this.autoplay = autoplay;
+	}
+
+	public void setCreateNoMediaFile(boolean createNoMediaFile) {
+		this.createNoMediaFile = createNoMediaFile;
+	}
 	
 }
