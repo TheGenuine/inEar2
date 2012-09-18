@@ -43,6 +43,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 		this.listAdapter = new PlaylistAdapter(this.appContext, android.R.layout.simple_list_item_1, currentPlaylist);
 		this.playlistView.setAdapter(this.listAdapter);
 		this.playlistView.setOnItemClickListener(this.onPlaylistItemListener);
+		this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
 	}
 	
 	private OnItemClickListener onPlaylistItemListener = new OnItemClickListener() {
@@ -64,6 +65,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 			if(this.playlistView != null)
 			{
 				this.listAdapter.notifyDataSetChanged();
+				this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
 			}
 		}
 	}
