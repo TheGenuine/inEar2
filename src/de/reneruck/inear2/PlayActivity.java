@@ -39,6 +39,7 @@ public class PlayActivity extends Activity{
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        this.setTitle(this.appContext.getCurrentAudiobookBean().getName());
 	}
 
 	@Override

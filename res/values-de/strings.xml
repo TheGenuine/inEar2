@@ -1,9 +1,5 @@
 <resources>
 
-    <string name="app_name">InEar</string>
-    <string name="title_activity_main">InEar</string>
-    <string name="title_activity_play">PlayActivity</string>
-    
     <string name="no_way_back">Kein zurück mehr!!!</string>
     <string name="no_databasemanager">Keine Datenbank verfügbar, kann Lesezeichen nicht speichern</string>
     <string name="no_audiobooks_found">Es wurden keine Hörbücher gefunden in</string>
