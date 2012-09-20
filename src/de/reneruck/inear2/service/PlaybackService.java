@@ -30,10 +30,10 @@ import de.reneruck.inear2.db.DatabaseManager;
 
 public class PlaybackService extends Service implements OnCompletionListener {
 	
-//	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
-//	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
-//	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
-//	public static final String ACTION_SET_TRACK = "de.reneruck.inear.action.set_track";
+	public static final String ACTION_PLAY_PAUSE = "de.reneruck.inear.action.play_pause";
+	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
+	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
+	public static final String ACTION_SET_TRACK = "de.reneruck.inear.action.set_track";
 	public static final String ACTION_SET_TRACK_NR = "de.reneruck.inear.action.set_track.nr";
 	
 	private static final String TAG = "InEar - PlaybackService";
@@ -64,12 +64,12 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		
 		this.binder = new PlaybackServiceHandlerImpl(this);
 		
-//		IntentFilter commandFilter = new IntentFilter();
-//		commandFilter.addAction(ACTION_PLAY_PAUSE);
-//		commandFilter.addAction(ACTION_NEXT);
-//		commandFilter.addAction(ACTION_PREVIOUS);
-//		commandFilter.addAction(ACTION_SET_TRACK);
-//		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
+		IntentFilter commandFilter = new IntentFilter();
+		commandFilter.addAction(ACTION_PLAY_PAUSE);
+		commandFilter.addAction(ACTION_NEXT);
+		commandFilter.addAction(ACTION_PREVIOUS);
+		commandFilter.addAction(ACTION_SET_TRACK);
+		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
 		
 		setupRemoteControlClient();
 		
@@ -113,8 +113,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
         // Update the remote controls
         this.rcClient.editMetadata(true)
                 .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, this.bean.getCurrentTrackName())
-                .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
-                        this.mediaPlayer.getDuration())
+                .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, this.mediaPlayer.getDuration())
                 .apply();
 	}
 	
@@ -142,6 +141,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 			this.mediaPlayer.setDataSource(this.bean.getPlaylist().get(this.bean.getCurrentTrack()));
 			this.mediaPlayer.prepare();
 			this.mediaPlayer.seekTo(0);
+			updateMetadata();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
