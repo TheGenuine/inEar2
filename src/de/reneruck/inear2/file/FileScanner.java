@@ -7,6 +7,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,10 +20,13 @@ public class FileScanner extends AsyncTask<Void, Void, Void> {
 	public static final String END_OF_CD = "endOfTheCD";
 
 	private AppContext appContext;
+
+	private Comparator<String> alphaNumComp;
 	
 	public FileScanner(AppContext appContext) {
 		super();
 		this.appContext = appContext;
+		this.alphaNumComp = new AlphanumComparator();
 	}
 
 	@Override
@@ -44,16 +49,16 @@ public class FileScanner extends AsyncTask<Void, Void, Void> {
 	}
 
 	private void createCompletePlaylist(File audiobookDir) {
-		File[] listFiles = audiobookDir.listFiles(dirFilter);
+		File[] filesInAudiobookDir = audiobookDir.listFiles(dirFilter);
 		List<String> mediaFiles = new LinkedList<String>();
 		mediaFiles.addAll(getMediafiles(audiobookDir));
 		
 		if(this.appContext.getSettings().isCreateNoMediaFile()) createNoMediaFile(audiobookDir);
 		
-		for (File dir : listFiles) {
-			mediaFiles.addAll(getMediafiles(dir));
+		for (File subDir : filesInAudiobookDir) {
+			mediaFiles.addAll(getMediafiles(subDir));
 			addEndOfCdTag(mediaFiles);
-			if(this.appContext.getSettings().isCreateNoMediaFile()) createNoMediaFile(dir);
+			if(this.appContext.getSettings().isCreateNoMediaFile()) createNoMediaFile(subDir);
 		}
 		removeLastEndOfCdTag(mediaFiles);
 		createAndWritePlaylist(audiobookDir, mediaFiles);
@@ -105,6 +110,7 @@ public class FileScanner extends AsyncTask<Void, Void, Void> {
 		for (int i = 0; i < medFiles.length; i++) {
 			result.add(medFiles[i].getAbsolutePath());
 		}
+		Collections.sort(result, this.alphaNumComp);
 		return result;
 	}
 
