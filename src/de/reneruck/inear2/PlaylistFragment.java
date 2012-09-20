@@ -40,7 +40,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 
 	private void setupListView() {
 		this.currentPlaylist = this.appContext.getCurrentAudiobookBean().getPlaylist();
-		this.listAdapter = new PlaylistAdapter(this.appContext, android.R.layout.simple_list_item_1, currentPlaylist);
+		this.listAdapter = new PlaylistAdapter(this.appContext, R.layout.playlist_entry, currentPlaylist);
 		this.playlistView.setAdapter(this.listAdapter);
 		this.playlistView.setOnItemClickListener(this.onPlaylistItemListener);
 		this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
