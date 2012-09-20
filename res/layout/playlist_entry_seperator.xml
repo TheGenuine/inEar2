@@ -8,7 +8,7 @@
     <View
         android:id="@+id/view1"
         android:layout_width="fill_parent"
-        android:layout_height="2px"
+        android:layout_height="2dip"
         android:background="@xml/playlist_seperator_gradient"
         android:tag="seperator"/>
 
