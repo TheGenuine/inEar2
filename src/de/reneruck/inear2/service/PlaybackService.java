@@ -72,7 +72,11 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		Log.d(TAG, "-- onStartCommand --");
 		if(isNewAudiobook()) {
 			this.bean = this.appContext.getCurrentAudiobookBean();
-			if(!loadBookmark())  prepareMediaplayerToCurrentTrack();
+			if(this.bean != null && this.bean.getPlaylist().size() >= 1){
+				if(!loadBookmark())  prepareMediaplayerToCurrentTrack();
+			} else {
+				Toast.makeText(getApplicationContext(), R.string.toast_no_valid_files_to_play, Toast.LENGTH_LONG).show();
+			}
 		}
 
 		return super.onStartCommand(intent, flags, startId);
@@ -316,8 +320,8 @@ public class PlaybackService extends Service implements OnCompletionListener {
 			next(true);
 		} catch (PlaylistFinishedException e) {
 			Log.d(TAG, "End of Playlist reached");
-			this.bean.setCurrentTrack(0);
-			prepareMediaplayerToCurrentTrack();
+//			this.bean.setCurrentTrack(0);
+//			prepareMediaplayerToCurrentTrack();
 		}
 	}
 

@@ -26,6 +26,7 @@
     
     <string name="notification_title">InEar läuft</string>
     
-        <string name="toast_audiobook_is_finished">Hörbuch zu Ende</string>
+	<string name="toast_audiobook_is_finished">Hörbuch zu Ende</string>
+    <string name="toast_no_valid_files_to_play">Das Hörbuch enthält keine abspielbaren Dateien</string>
     
 </resources>

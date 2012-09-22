@@ -13,11 +13,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import de.reneruck.inear2.AppContext;
 
 public class FileScanner extends AsyncTask<Void, Void, Void> {
 
 	public static final String END_OF_CD = "endOfTheCD";
+
+	private static final String TAG = "Inear2 - FileScanner";
 
 	private AppContext appContext;
 
@@ -69,7 +72,9 @@ public class FileScanner extends AsyncTask<Void, Void, Void> {
 	}
 	
 	private void removeLastEndOfCdTag(List<String> mediaFiles) {
-		if(mediaFiles.get(mediaFiles.size()-1).equals(END_OF_CD)) mediaFiles.remove(mediaFiles.size() -1);
+		if(mediaFiles.size() >= 1) {
+			if(mediaFiles.get(mediaFiles.size()-1).equals(END_OF_CD)) mediaFiles.remove(mediaFiles.size() -1);
+		}
 	}
 
 	private void createNoMediaFile(File dir) {
@@ -107,10 +112,12 @@ public class FileScanner extends AsyncTask<Void, Void, Void> {
 	private List<String> getMediafiles(File dir) {
 		File[] medFiles = dir.listFiles(mediaFileFilter);
 		List<String> result = new LinkedList<String>();
-		for (int i = 0; i < medFiles.length; i++) {
-			result.add(medFiles[i].getAbsolutePath());
+		if(medFiles != null) {
+			for (int i = 0; i < medFiles.length; i++) {
+				result.add(medFiles[i].getAbsolutePath());
+			}
+			Collections.sort(result, this.alphaNumComp);
 		}
-		Collections.sort(result, this.alphaNumComp);
 		return result;
 	}
 
