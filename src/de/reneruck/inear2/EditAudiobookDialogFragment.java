@@ -52,6 +52,21 @@ public class EditAudiobookDialogFragment extends DialogFragment {
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
+			switch (pos) {
+			case 0: // rename
+				dismiss();
+				
+				break;
+			case 1: // reset playlist
+				
+				break;
+			case 2: // delete
+				
+				break;
+
+			default:
+				break;
+			}
 		}   
 	};
 
