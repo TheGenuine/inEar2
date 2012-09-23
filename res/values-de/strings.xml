@@ -29,4 +29,7 @@
 	<string name="toast_audiobook_is_finished">Hörbuch zu Ende</string>
     <string name="toast_no_valid_files_to_play">Das Hörbuch enthält keine abspielbaren Dateien</string>
     
+	<string name="dialog_rename">Umbenennen</string>
+    <string name="dialog_reset_playlist">Playlist zurücksetzen</string>
+    <string name="dialog_delete">Löschen</string>
 </resources>

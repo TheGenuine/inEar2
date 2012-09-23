@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ public class MainActivity extends Activity {
 
 	private File audioBooksBaseDir;
 	private List<String> audioBookTitles;
+
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class MainActivity extends Activity {
 		ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, this.audioBookTitles);
 		audiobooksList.setAdapter(listAdapter);
 		audiobooksList.setOnItemClickListener(this.audiobookItemClickListener);
+		audiobooksList.setOnItemLongClickListener(this.audiobookItemLongClickListener);
 		audiobooksList.invalidate();
 	}
 
@@ -69,6 +74,19 @@ public class MainActivity extends Activity {
     		Intent i = new Intent(getApplicationContext(), PlayActivity.class);
     		startActivity(i);
     	}
+	};
+	
+	private OnItemLongClickListener audiobookItemLongClickListener = new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> adapter, View view, int pos, long id) {
+			FragmentManager fm = getFragmentManager();
+			FragmentTransaction transaction = fm.beginTransaction();
+			transaction.add(new EditAudiobookDialogFragment(audioBookTitles.get(pos)), "edit");
+			transaction.commit();
+			return true;
+		}
+		
 	};
 
     private void getAllAudiobooks() {

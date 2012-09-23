@@ -30,4 +30,9 @@
     
     <string name="toast_audiobook_is_finished">Audiobook is finished</string>
     <string name="toast_no_valid_files_to_play">Audiobook contains no valid files to play</string>
+    
+    <string name="dialog_rename">Rename</string>
+    <string name="dialog_reset_playlist">Reset playlist</string>
+    <string name="dialog_delete">Delete</string>
+    
 </resources>

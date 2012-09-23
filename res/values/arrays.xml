@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="array_dialog_entries">
+        <item>@string/dialog_rename</item>
+        <item>@string/dialog_reset_playlist</item>
+        <item>@string/dialog_delete</item>
+    </array>
+</resources>
