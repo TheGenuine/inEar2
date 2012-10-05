@@ -1,8 +1,11 @@
 package de.reneruck.inear2;
 
+import java.io.File;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class EditAudiobookDialogFragment extends DialogFragment {
 
@@ -24,8 +28,6 @@ public class EditAudiobookDialogFragment extends DialogFragment {
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setCancelable(true);
-//		int style = DialogFragment.STYLE_NORMAL, theme = 0;
-//		setStyle(style, theme);
 	}
 
 	@Override
@@ -55,18 +57,46 @@ public class EditAudiobookDialogFragment extends DialogFragment {
 			switch (pos) {
 			case 0: // rename
 				dismiss();
-				
 				break;
 			case 1: // reset playlist
-				
+				resetPlaylist();
 				break;
 			case 2: // delete
-				
-				break;
-
-			default:
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				final OnClickListener deleteListener = new OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String path = ((AppContext)getActivity().getApplicationContext()).getAudiobokkBaseDir() + File.separator + audibookName;
+						File f = new File(path);
+						if(f.exists() && f.isDirectory())
+						{
+							Toast.makeText(getActivity(), "Deleting " + path, Toast.LENGTH_LONG).show();
+						}
+					}
+				};
+				ft.add(new DialogFragment(){
+					public Dialog onCreateDialog(Bundle savedInstanceState) {
+						return new AlertDialog.Builder(getActivity()).setTitle("Delete")
+								.setMessage("Do you really want to delete this Audiobook")
+								.setPositiveButton("yes", deleteListener)
+								.setNegativeButton("no", new OnClickListener() {
+									
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dismiss();
+									}
+								}).create();
+					}
+				}, "confirm");
+				ft.commit();
 				break;
 			}
+		}
+
+		private void resetPlaylist() {
+			// TODO Auto-generated method stub
+			
 		}   
 	};
 
