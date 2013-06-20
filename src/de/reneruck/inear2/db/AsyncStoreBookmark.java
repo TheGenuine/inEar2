@@ -1,13 +1,11 @@
 package de.reneruck.inear2.db;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import de.reneruck.inear2.Bookmark;
 
-@SuppressLint({ "ParserError", "ParserError" })
 public class AsyncStoreBookmark extends AsyncTask<Bookmark, Void, Void> {
 
 	private DatabaseManager databaseManager;
