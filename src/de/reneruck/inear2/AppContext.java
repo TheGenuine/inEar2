@@ -68,7 +68,7 @@ public class AppContext extends Application {
 		});
 	}
 	
-	private void runFilescanner() {
+	public void runFilescanner() {
 		FileScanner fileScanner = new FileScanner(this);
 		fileScanner.doInBackground();
 	}

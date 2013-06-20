@@ -20,6 +20,9 @@ public class EditAudiobookDialogFragment extends DialogFragment {
 
 	private String audibookName;
 
+	public EditAudiobookDialogFragment() {
+	}
+	
 	public EditAudiobookDialogFragment(String audibookName) {
 		this.audibookName = audibookName;
 	}
@@ -56,7 +59,7 @@ public class EditAudiobookDialogFragment extends DialogFragment {
 		public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
 			switch (pos) {
 			case 0: // rename
-				dismiss();
+				renameAudiobook();
 				break;
 			case 1: // reset playlist
 				resetPlaylist();
@@ -93,11 +96,20 @@ public class EditAudiobookDialogFragment extends DialogFragment {
 				break;
 			}
 		}
-
-		private void resetPlaylist() {
-			// TODO Auto-generated method stub
-			
-		}   
 	};
+	
+	private void renameAudiobook() {
+		dismiss();
+	}
+	
+	private void resetPlaylist() {
+		AppContext appContext = (AppContext) getActivity().getApplicationContext();
+		File playlistFile = new File(appContext.getAudiobokkBaseDir() + File.separator + this.audibookName + File.separator + this.audibookName + ".m3u");
+		if(playlistFile.exists()) {
+			playlistFile.delete();
+			appContext.runFilescanner();
+		}
+		dismiss();
+	}   
 
 }
