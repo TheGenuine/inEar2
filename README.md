@@ -1,8 +1,12 @@
 inEar2
 ======
 
-This is a simple audioplayer intended for Audiobooks.
-It can remember the current track and position of all audiobooks found on your device.
+It's a simple player intended for Audiobooks.
+It can remember the current track and position of all Audiobooks found on your device.
 
 **STILL UNDER DEELOPMENT**  
-will be finished when I have time.
+
+Following some screenshots to get an idea of how it looks like. (Without any beautifications yet)
+<center>
+<img src=screenshot2.png width=300 height=500> <img src=screenshot1.png width=300 height=500>
+</center>
