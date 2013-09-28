@@ -14,13 +14,13 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-import de.reneruck.inear2.db.AsyncStoreBookmark;
 import de.reneruck.inear2.AppContext;
 import de.reneruck.inear2.Bookmark;
 import de.reneruck.inear2.CurrentAudiobook;
 import de.reneruck.inear2.PlayActivity;
 import de.reneruck.inear2.PlaylistFinishedException;
 import de.reneruck.inear2.R;
+import de.reneruck.inear2.db.AsyncStoreBookmark;
 import de.reneruck.inear2.db.DatabaseManager;
 
 public class PlaybackService extends Service implements OnCompletionListener {
