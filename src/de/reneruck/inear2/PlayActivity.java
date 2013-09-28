@@ -133,8 +133,9 @@ public class PlayActivity extends Activity{
 			TextView durationField = (TextView)findViewById(R.id.playback_max_time);
 			int seconds = (int) (duration / 1000) % 60 ;
 			int minutes = (int) ((duration / (1000*60)) % 60);		
+			int hours = (int) ((duration / (1000*60*60)) % 60);		
 			String secoundsString = seconds < 10 ? "0" + seconds : String.valueOf(seconds);
-			String durationText = minutes + ":" + secoundsString;
+			String durationText = hours > 0 ? hours + ":" : "" + minutes + ":" + secoundsString;
 			durationField.setText(durationText);
 		}
 	}
