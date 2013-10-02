@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import de.reneruck.inear2.settings.SettingsActivity;
@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
 	private void initializeAndshowLayout() {
 		setContentView(R.layout.activity_main);
 		ListView audiobooksList = (ListView) findViewById(R.id.audiobooklist);
-		ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, this.audioBookTitles);
+		ListAdapter listAdapter = new AudiobookListAdapter(this, audioBookTitles);
 		audiobooksList.setAdapter(listAdapter);
 		audiobooksList.setOnItemClickListener(this.audiobookItemClickListener);
 		audiobooksList.invalidate();

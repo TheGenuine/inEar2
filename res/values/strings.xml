@@ -30,4 +30,5 @@
     
     <string name="toast_audiobook_is_finished">Audiobook is finished</string>
     <string name="toast_no_valid_files_to_play">Audiobook contains no valid files to play</string>
+    <string name="author_unknown">Unknown</string>
 </resources>
