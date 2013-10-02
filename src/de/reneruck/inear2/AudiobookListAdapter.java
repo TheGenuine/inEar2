@@ -58,7 +58,6 @@ public class AudiobookListAdapter extends BaseAdapter {
 			artist.setText(split[0].trim());
 			title.setText(split[1].trim());
 		} else {
-//			artist.setText(R.string.author_unknown);
 			title.setText(split[0].trim());
 		}
 //		duration.setText();
