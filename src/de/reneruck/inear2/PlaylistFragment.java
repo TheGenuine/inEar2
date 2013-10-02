@@ -4,8 +4,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import de.reneruck.inear2.service.PlaybackService;
-
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,13 +13,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import de.reneruck.inear2.service.PlaybackService;
 
 public class PlaylistFragment extends Fragment implements PropertyChangeListener{
 	
 	private AppContext appContext;
 	private List<String> currentPlaylist;
 	private ListView playlistView;
-	private PlaylistAdapter listAdapter;
+	private PlaylistAdapter2 listAdapter;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +39,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 
 	private void setupListView() {
 		this.currentPlaylist = this.appContext.getCurrentAudiobookBean().getPlaylist();
-		this.listAdapter = new PlaylistAdapter(this.appContext, R.layout.playlist_entry, currentPlaylist);
+		this.listAdapter = new PlaylistAdapter2(getActivity(), R.layout.playlist_entry, currentPlaylist);
 		this.playlistView.setAdapter(this.listAdapter);
 		this.playlistView.setOnItemClickListener(this.onPlaylistItemListener);
 		this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
