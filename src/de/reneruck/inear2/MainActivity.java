@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import android.R.anim;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +15,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SlidingDrawer;
 import android.widget.TextView;
+import de.reneruck.inear2.R.animator;
 import de.reneruck.inear2.settings.SettingsActivity;
 
 public class MainActivity extends Activity {
@@ -68,6 +71,7 @@ public class MainActivity extends Activity {
     		appContext.setCurrentAudiobook(audioBookTitles.get(pos));
     		Intent i = new Intent(getApplicationContext(), PlayActivity.class);
     		startActivity(i);
+        	overridePendingTransition(animator.activity_slide_in, animator.activity_slide_out);
     	}
 	};
 

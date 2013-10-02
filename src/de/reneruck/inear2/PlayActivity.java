@@ -1,5 +1,6 @@
 package de.reneruck.inear2;
 
+import android.R.anim;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import de.reneruck.inear2.R.animator;
 import de.reneruck.inear2.service.PlaybackService;
 import de.reneruck.inear2.service.PlaybackServiceHandler;
 
@@ -234,12 +236,19 @@ public class PlayActivity extends Activity{
 		switch (item.getItemId()) {
         case android.R.id.home:
         	finish();
+        	overridePendingTransition(anim.slide_in_left, anim.slide_out_right);
         	break;
         case R.id.menu_playlist:
         	
         	break;
 		}
 		return true;
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		overridePendingTransition(anim.slide_in_left, anim.slide_out_right);
 	}
 	
 	@Override
