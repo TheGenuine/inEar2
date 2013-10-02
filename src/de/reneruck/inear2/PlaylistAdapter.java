@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import de.reneruck.inear2.file.FileScanner;
 
-public class PlaylistAdapter2 extends BaseAdapter {
+public class PlaylistAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private ArrayList<String> mPlaylist;
@@ -23,7 +23,7 @@ public class PlaylistAdapter2 extends BaseAdapter {
 
 	private static LayoutInflater mInflater = null;
 
-	public PlaylistAdapter2(Context context, int recource, List<String> playlist) {
+	public PlaylistAdapter(Context context, int recource, List<String> playlist) {
 		mContext = context;
 		mRecource = recource;
 		mPlaylist = new ArrayList<String>(playlist);
@@ -76,11 +76,6 @@ public class PlaylistAdapter2 extends BaseAdapter {
 				text.setTextColor(Color.WHITE);
 			}
 		}
-		
-		
-		
-
-
 		return view;
 	}
 

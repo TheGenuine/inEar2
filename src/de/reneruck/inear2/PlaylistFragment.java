@@ -20,7 +20,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 	private AppContext appContext;
 	private List<String> currentPlaylist;
 	private ListView playlistView;
-	private PlaylistAdapter2 listAdapter;
+	private PlaylistAdapter listAdapter;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 
 	private void setupListView() {
 		this.currentPlaylist = this.appContext.getCurrentAudiobookBean().getPlaylist();
-		this.listAdapter = new PlaylistAdapter2(getActivity(), R.layout.playlist_entry, currentPlaylist);
+		this.listAdapter = new PlaylistAdapter(getActivity(), R.layout.playlist_entry, currentPlaylist);
 		this.playlistView.setAdapter(this.listAdapter);
 		this.playlistView.setOnItemClickListener(this.onPlaylistItemListener);
 		this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
