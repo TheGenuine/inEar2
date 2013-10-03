@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import de.reneruck.inear2.AppContext;
 
 public class FileScanner extends AsyncTask<Void, Void, Void> {
