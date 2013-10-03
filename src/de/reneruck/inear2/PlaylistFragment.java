@@ -4,22 +4,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import android.app.Fragment;
+import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import de.reneruck.inear2.service.PlaybackService;
 
-public class PlaylistFragment extends Fragment implements PropertyChangeListener{
+public class PlaylistFragment extends ListFragment implements PropertyChangeListener{
 	
 	private AppContext appContext;
 	private List<String> currentPlaylist;
-	private ListView playlistView;
 	private PlaylistAdapter listAdapter;
 	
 	@Override
@@ -27,44 +26,41 @@ public class PlaylistFragment extends Fragment implements PropertyChangeListener
 		super.onCreate(savedInstanceState);
 		this.appContext = (AppContext) getActivity().getApplicationContext();
 		this.appContext.getCurrentAudiobookBean().addPropertyChangeListener(this);
+
+		this.currentPlaylist = this.appContext.getCurrentAudiobookBean().getPlaylist();
+		this.listAdapter = new PlaylistAdapter(getActivity(), R.layout.playlist_entry, currentPlaylist);
+		setListAdapter(this.listAdapter);
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View inflated = inflater.inflate(R.layout.fragment_playlist, container);
-		this.playlistView = (ListView) inflated.findViewById(R.id.playlist);
-		setupListView();
 		return inflated;
 	}
 
-	private void setupListView() {
-		this.currentPlaylist = this.appContext.getCurrentAudiobookBean().getPlaylist();
-		this.listAdapter = new PlaylistAdapter(getActivity(), R.layout.playlist_entry, currentPlaylist);
-		this.playlistView.setAdapter(this.listAdapter);
-		this.playlistView.setOnItemClickListener(this.onPlaylistItemListener);
-		this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		getListView().setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View view, int position, long id) {
+		if(!"seperator".equals(view.getTag())){
+			Intent i = new Intent(PlaybackService.ACTION_SET_TRACK);
+			i.putExtra(PlaybackService.ACTION_SET_TRACK_NR, position);
+			appContext.sendBroadcast(i);
+		}
 	}
 	
-	private OnItemClickListener onPlaylistItemListener = new OnItemClickListener() {
-
-		@Override
-		public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
-			if(!"seperator".equals(view.getTag())){
-				Intent i = new Intent(PlaybackService.ACTION_SET_TRACK);
-				i.putExtra(PlaybackService.ACTION_SET_TRACK_NR, pos);
-				appContext.sendBroadcast(i);
-			}
-		}
-	};
-
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if("track".equals(event.getPropertyName()))
 		{
-			if(this.playlistView != null)
+			if(getListView() != null)
 			{
 				this.listAdapter.notifyDataSetChanged();
-				this.playlistView.setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
+				getListView().setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
 			}
 		}
 	}

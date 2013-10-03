@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -17,13 +19,13 @@ import de.reneruck.inear2.file.FileScanner;
 
 public class PlaylistAdapter extends BaseAdapter {
 
-	private Context mContext;
+	private Activity mContext;
 	private ArrayList<String> mPlaylist;
 	private int mRecource;
 
-	private static LayoutInflater mInflater = null;
+	private LayoutInflater mInflater = null;
 
-	public PlaylistAdapter(Context context, int recource, List<String> playlist) {
+	public PlaylistAdapter(Activity context, int recource, List<String> playlist) {
 		mContext = context;
 		mRecource = recource;
 		mPlaylist = new ArrayList<String>(playlist);
@@ -69,11 +71,11 @@ public class PlaylistAdapter extends BaseAdapter {
 			int currentTrack = ((AppContext)this.mContext.getApplicationContext()).getCurrentAudiobookBean().getCurrentTrack();
 			if(currentTrack == position)
 			{
-				text.setTypeface(null,Typeface.BOLD);
+//				text.setTypeface(null,Typeface.BOLD);
 				text.setTextColor(Color.RED);
 			} else {
-				text.setTypeface(null,Typeface.NORMAL);
-				text.setTextColor(Color.WHITE);
+//				text.setTypeface(null,Typeface.NORMAL);
+				text.setTextColor(Color.BLACK);
 			}
 		}
 		return view;
