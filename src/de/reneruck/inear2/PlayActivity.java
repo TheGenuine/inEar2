@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import de.reneruck.inear2.R.animator;
 import de.reneruck.inear2.service.PlaybackService;
 import de.reneruck.inear2.service.PlaybackServiceHandler;
 
