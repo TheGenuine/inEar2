@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
     	if(this.audioBooksBaseDir != null && this.audioBooksBaseDir.exists())
     	{
     		getAllAudiobooks();
-    		initializeAndshowLayout();
+    		initializeAndShowLayout();
     	} else {
     		showNoEntriesFoundScreen();
     	}
@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
 		((TextView)findViewById(R.id.no_entries_path)).setText(this.appContext.getAudiobokkBaseDir());
 	}
 
-	private void initializeAndshowLayout() {
+	private void initializeAndShowLayout() {
 		setContentView(R.layout.activity_main);
 		ListView audiobooksList = (ListView) findViewById(R.id.audiobooklist);
 		ListAdapter listAdapter = new AudiobookListAdapter(this, audioBookTitles);
