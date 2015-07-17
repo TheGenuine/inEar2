@@ -4,7 +4,7 @@ inEar2
 It's a simple player intended for Audiobooks.
 It can remember the current track and position of all Audiobooks found on your device.
 
-**STILL UNDER DEELOPMENT**  
+**STILL UNDER DEVELOPMENT**
 
 **Features**
 * Scan/watch and cataloge Audiobooks in specific directory
