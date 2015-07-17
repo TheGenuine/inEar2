@@ -171,9 +171,9 @@ public class PlayActivity extends Activity{
 	
 	private void setPlaybackControlIcon() {
 		if (this.playbackServiceHandler.isPlaying()) {
-			((ImageView) findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_pause);
+			((ImageView) findViewById(R.id.button_play)).setImageResource(R.drawable.ic_play_stop);
 		} else {
-			((ImageView) findViewById(R.id.button_play)).setImageResource(android.R.drawable.ic_media_play);
+			((ImageView) findViewById(R.id.button_play)).setImageResource(R.drawable.ic_play_start);
 		}
 	}
 	
