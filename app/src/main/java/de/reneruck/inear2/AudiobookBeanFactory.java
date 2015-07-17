@@ -16,7 +16,7 @@ import de.reneruck.inear2.db.DatabaseManager;
 
 public class AudiobookBeanFactory {
 
-	private static final String TAG = "InEar - AudiobookBeanFactory";
+	private static final String TAG = "InEar-AudiobookBeanFac";
 	private String audiobookName;
 	private String audiobookBaseDir;
 	private CurrentAudiobook currentAudiobookBean;
