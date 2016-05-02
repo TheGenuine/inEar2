@@ -68,7 +68,6 @@ public class AppContext extends Application {
 		if(this.mCurrentAudioBook == null || !this.mCurrentAudioBook.equals(currentAudioBook))
 		{
 			this.mCurrentAudioBook = currentAudioBook;
-			this.mCurrentAudioBook.loadStoredBookmark();
 		} else {
 			Log.d(TAG, currentAudioBook.getName() + " already loaded, nothing to do");
 		}

@@ -87,8 +87,9 @@ public class FileScanner extends ListenableAsyncTask<Void, Void, List<AudioBook>
 						Log.d(TAG, documentName + " is a dir");
 						Uri audioBookChildrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(baseDir, documentId);
 
-						AudioBook book = new AudioBook(documentName)
+						AudioBook book = new AudioBook(appContext, documentName)
 								.withPlaylist(deepCollectFilePaths(audioBookChildrenUri, Arrays.asList(MIME_TYPES)));
+						book.loadStoredBookmark();
 						audioBooks.add(book);
 
 //						if(!hasPlaylist(audioBookChildrenUri)){
