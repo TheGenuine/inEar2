@@ -273,13 +273,13 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	}
 	
 	private void toForeground() {
-		Log.e(TAG, "-- ToForeground --");
+		Log.d(TAG, "-- ToForeground --");
 		this.foreground = true;
 		startForeground(1333, generateNotification());
 	}
 	
 	private void stopForeground() {
-		Log.e(TAG, "-- stoppingForeground --");
+		Log.d(TAG, "-- stoppingForeground --");
 		this.foreground = false;
 		stopForeground(true);
 	}
@@ -405,7 +405,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		} else {
 			String string = getString(R.string.no_databasemanager);
 			Toast.makeText(getApplicationContext(), string, Toast.LENGTH_LONG).show();
-			Log.e(TAG, string);
+			Log.w(TAG, string);
 		}
 	}
 }
