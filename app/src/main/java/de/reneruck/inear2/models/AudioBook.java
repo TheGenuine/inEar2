@@ -1,16 +1,21 @@
-package de.reneruck.inear2;
+package de.reneruck.inear2.models;
+
+import android.util.Log;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.List;
 
+import de.reneruck.inear2.AppContext;
+import de.reneruck.inear2.ListenableAsyncTask;
 import de.reneruck.inear2.db.AsyncGetBookmark;
-import de.reneruck.inear2.db.DatabaseManager;
+import de.reneruck.inear2.exceptions.PlaylistFinishedException;
 import de.reneruck.inear2.file.FileScanner;
 
 public class AudioBook {
 
-	private int id;
+    private static final String TAG = "AudioBook";
+    private int id;
 	private String name;
 	private String author;
 	private List<String> playlist;
@@ -18,10 +23,11 @@ public class AudioBook {
 	private Bookmark bookmark;
 
 	private PropertyChangeSupport changes = new PropertyChangeSupport(this);
-	private DatabaseManager databaseManager;
+    private AppContext mAppContext;
 
-	public AudioBook(String name) {
-		this.id = name.hashCode();
+    public AudioBook(AppContext context, String name) {
+        this.mAppContext = context;
+        this.id = name.hashCode();
 		this.name = name;
 	}
 
@@ -94,8 +100,8 @@ public class AudioBook {
 	}
 
 	public void loadStoredBookmark() {
-        if(bookmark != null){
-            AsyncGetBookmark getBookmarkTask = new AsyncGetBookmark(this.databaseManager);
+        if(bookmark == null){
+            AsyncGetBookmark getBookmarkTask = new AsyncGetBookmark(this.mAppContext.getDatabaseManager());
             getBookmarkTask.execute(this);
             getBookmarkTask.listenWith(new ListenableAsyncTask.AsyncTaskListener<Bookmark>() {
                 @Override
@@ -104,6 +110,8 @@ public class AudioBook {
                     {
                         setBookmark(bookmark);
                         setCurrentTrack(bookmark.getTrackNumber());
+                    } else {
+                        Log.d(TAG, "No bookmark to load for " + getName());
                     }
                 }
             });

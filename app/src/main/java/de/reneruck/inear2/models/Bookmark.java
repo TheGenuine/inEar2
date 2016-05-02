@@ -1,4 +1,4 @@
-package de.reneruck.inear2;
+package de.reneruck.inear2.models;
 
 public class Bookmark {
 
