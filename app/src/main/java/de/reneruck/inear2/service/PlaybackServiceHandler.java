@@ -1,8 +1,6 @@
 package de.reneruck.inear2.service;
 
-import android.app.Notification;
-
-import de.reneruck.inear2.PlaylistFinishedException;
+import de.reneruck.inear2.exceptions.PlaylistFinishedException;
 
 
 public interface PlaybackServiceHandler {

@@ -17,7 +17,7 @@ import android.provider.DocumentsContract;
 import android.util.Log;
 
 import de.reneruck.inear2.AppContext;
-import de.reneruck.inear2.AudioBook;
+import de.reneruck.inear2.models.AudioBook;
 import de.reneruck.inear2.ListenableAsyncTask;
 
 public class FileScanner extends ListenableAsyncTask<Void, Void, List<AudioBook>> {

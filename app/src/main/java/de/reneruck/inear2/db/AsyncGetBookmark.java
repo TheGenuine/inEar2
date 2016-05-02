@@ -3,8 +3,8 @@ package de.reneruck.inear2.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import de.reneruck.inear2.AudioBook;
-import de.reneruck.inear2.Bookmark;
+import de.reneruck.inear2.models.AudioBook;
+import de.reneruck.inear2.models.Bookmark;
 import de.reneruck.inear2.ListenableAsyncTask;
 
 public class AsyncGetBookmark extends ListenableAsyncTask<AudioBook, Void, Bookmark> {

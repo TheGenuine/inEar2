@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import de.reneruck.inear2.Bookmark;
+import de.reneruck.inear2.models.Bookmark;
 
 public class AsyncStoreBookmark extends AsyncTask<Bookmark, Void, Void> {
 

@@ -12,6 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import de.reneruck.inear2.models.AudioBook;
+
 public class AudiobookListAdapter extends BaseAdapter {
 
 	private Activity mActivity;

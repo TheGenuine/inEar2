@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import de.reneruck.inear2.R.animator;
 import de.reneruck.inear2.file.FileScanner;
+import de.reneruck.inear2.models.AudioBook;
 import de.reneruck.inear2.settings.SettingsActivity;
 
 public class MainActivity extends Activity {

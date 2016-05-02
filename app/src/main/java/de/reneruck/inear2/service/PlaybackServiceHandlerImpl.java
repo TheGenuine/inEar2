@@ -2,10 +2,9 @@ package de.reneruck.inear2.service;
 
 import java.security.InvalidParameterException;
 
-import de.reneruck.inear2.PlaylistFinishedException;
+import de.reneruck.inear2.exceptions.PlaylistFinishedException;
 import de.reneruck.inear2.R;
 
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

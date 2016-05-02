@@ -12,6 +12,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.reneruck.inear2.db.DatabaseManager;
+import de.reneruck.inear2.models.AudioBook;
 import de.reneruck.inear2.service.PlaybackService;
 
 
