@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <EditTextPreference
-        android:defaultValue="/mnt/sdcard/Audiobooks"
+    <!--<EditTextPreference-->
+        <!--android:defaultValue= "@string/pref_base_dir_default"-->
+        <!--android:key="pref_base_dir"-->
+        <!--android:summary="@string/pref_base_dir_summary"-->
+        <!--android:title="@string/pref_base_dir" />-->
+
+    <Preference
+        android:defaultValue= "@string/pref_base_dir_default"
         android:key="pref_base_dir"
         android:summary="@string/pref_base_dir_summary"
-        android:title="@string/pref_base_dir" />
+        android:title="@string/pref_base_dir">
+        <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE"/>
+    </Preference>
 
     <CheckBoxPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="pref_autoplay"
         android:summary="@string/pref_autoplay_summary"
         android:title="@string/pref_autoplay" />
