@@ -1,22 +1,25 @@
 package de.reneruck.inear2.service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 import de.reneruck.inear2.AppContext;
+import de.reneruck.inear2.AudioBook;
 import de.reneruck.inear2.Bookmark;
-import de.reneruck.inear2.CurrentAudiobook;
 import de.reneruck.inear2.PlayActivity;
 import de.reneruck.inear2.PlaylistFinishedException;
 import de.reneruck.inear2.R;
@@ -29,50 +32,116 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public static final String ACTION_NEXT = "de.reneruck.inear.action.next";
 	public static final String ACTION_PREVIOUS = "de.reneruck.inear.action.previous";
 	public static final String ACTION_SET_TRACK = "de.reneruck.inear.action.set_track";
+	public static final String ACTION_DISMISS = "de.reneruck.inear.action.dismiss";
+
 	public static final String ACTION_SET_TRACK_NR = "de.reneruck.inear.action.set_track.nr";
-	
+
 	private static final String TAG = "InEar - PlaybackService";
-	
 	private static final int play_pause = 1;
 	private static final int next = 2;
 	private static final int previous = 3;
 
 
-	private MediaPlayer mediaPlayer;
-	private AppContext appContext;
+	private MediaPlayer mMediaPlayer;
+	private MediaSession mMediaSession;
+    private AppContext mAppContext;
+    private NotificationManager mNotificationManager;
+    private AudioManager mAudioManager;
+
 	private Notification notification;
-	
 	private int boundEntities = 0;
-	private CurrentAudiobook bean;
+	private AudioBook currentAudioBook;
 	private PlaybackServiceHandlerImpl binder;
 	private boolean foreground = false;
-	
+
 	@Override
 	public void onCreate() {
 		Log.d(TAG, "-- onCreate --");
-		this.mediaPlayer = new MediaPlayer();
-		this.mediaPlayer.setOnCompletionListener(this);
-		this.appContext = (AppContext)getApplicationContext();
-		initNotification();
-		
-		this.binder = new PlaybackServiceHandlerImpl(this);
-		
-		IntentFilter commandFilter = new IntentFilter();
-		commandFilter.addAction(ACTION_PLAY_PAUSE);
-		commandFilter.addAction(ACTION_NEXT);
-		commandFilter.addAction(ACTION_PREVIOUS);
-		commandFilter.addAction(ACTION_SET_TRACK);
-		registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
-		
+		this.mMediaPlayer = new MediaPlayer();
+		this.mMediaPlayer.setOnCompletionListener(this);
+		this.mAppContext = (AppContext) getApplicationContext();
+        this.mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        this.binder = new PlaybackServiceHandlerImpl(this);
+
+//        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        setupMediaSession();
+        setCommandFilters();
+
 		super.onCreate();
 	}
-	
-	@Override
+
+    private void setupMediaSession() {
+        this.mMediaSession = new MediaSession(getApplicationContext(), TAG);
+
+        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mMediaSession.setCallback(new MediaSession.Callback() {
+            @Override
+            public void onPlay() {
+                play();
+            }
+
+            @Override
+            public void onPause() {
+                pause();
+            }
+
+            @Override
+            public void onSkipToNext() {
+                try {
+                    next(isPlaying());
+                } catch (PlaylistFinishedException e) {
+                    Log.d(TAG, "End of Playlist reached");
+                }
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                try {
+                    previous();
+                } catch (PlaylistFinishedException e) {
+                    Log.d(TAG, "End of Playlist reached");
+                }
+            }
+        });
+
+        mMediaSession.setActive(true);
+        updateMediaSessionPlaybackState();
+    }
+
+    private void updateMediaSessionPlaybackState(){
+
+        int state = isPlaying() ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED;
+
+        PlaybackState playbackState = new PlaybackState.Builder()
+                .setActions(
+                            PlaybackState.ACTION_PLAY |
+                            PlaybackState.ACTION_PLAY_PAUSE |
+                            PlaybackState.ACTION_PAUSE |
+                            PlaybackState.ACTION_SKIP_TO_NEXT |
+                            PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                .setState(state, this.mMediaPlayer.getCurrentPosition(), 1, SystemClock.elapsedRealtime())
+                .build();
+        mMediaSession.setPlaybackState(playbackState);
+    }
+
+    private void setCommandFilters() {
+        IntentFilter commandFilter = new IntentFilter();
+        commandFilter.addAction(ACTION_PLAY_PAUSE);
+        commandFilter.addAction(ACTION_NEXT);
+        commandFilter.addAction(ACTION_PREVIOUS);
+        commandFilter.addAction(ACTION_SET_TRACK);
+        registerReceiver(this.binder.getBroadcastHandler(), commandFilter);
+    }
+
+    @Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "-- onStartCommand --");
 		if(isNewAudiobook()) {
-			this.bean = this.appContext.getCurrentAudiobookBean();
-			if(this.bean != null && this.bean.getPlaylist().size() >= 1){
+			this.currentAudioBook = this.mAppContext.getCurrentAudiobook();
+			if(this.currentAudioBook != null && this.currentAudioBook.getPlaylist().size() >= 1){
 				if(!loadBookmark())  prepareMediaplayerToCurrentTrack();
 			} else {
 				Toast.makeText(getApplicationContext(), R.string.toast_no_valid_files_to_play, Toast.LENGTH_LONG).show();
@@ -83,12 +152,12 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	}
 
 	private boolean loadBookmark() {
-		Bookmark bookmark = this.bean.getBookmark();
+		Bookmark bookmark = this.currentAudioBook.getBookmark();
 		if(bookmark != null) {
 			Log.d(TAG, "Loading bookmark");
-			this.bean.setCurrentTrack(bookmark.getTrackNumber());
+			this.currentAudioBook.setCurrentTrack(bookmark.getTrackNumber());
 			prepareMediaplayerToCurrentTrack();
-			this.mediaPlayer.seekTo(bookmark.getPlaybackPosition());
+			this.mMediaPlayer.seekTo(bookmark.getPlaybackPosition());
 			return true;
 		}
 		return false;
@@ -96,111 +165,117 @@ public class PlaybackService extends Service implements OnCompletionListener {
 
 	private void prepareMediaplayerToCurrentTrack() {
 		try {
-			this.mediaPlayer.reset();
-			this.mediaPlayer.setDataSource(this.bean.getPlaylist().get(this.bean.getCurrentTrack()));
-			this.mediaPlayer.prepare();
-			this.mediaPlayer.seekTo(0);
+			this.mMediaPlayer.reset();
+			this.mMediaPlayer.setDataSource(this.currentAudioBook.getPlaylist().get(this.currentAudioBook.getCurrentTrack()));
+			this.mMediaPlayer.prepare();
+			this.mMediaPlayer.seekTo(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private boolean isNewAudiobook() {
-		if(this.bean == null) {
-			return true;
-		} else {
-			return !this.bean.equals(this.appContext.getCurrentAudiobookBean());
-		}
-	}
+        return this.currentAudioBook == null || !this.currentAudioBook.equals(this.mAppContext.getCurrentAudiobook());
+    }
 
-	private Handler handler = new Handler() {
-
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case play_pause:
-				if(mediaPlayer.isPlaying())
-				{
-					pause();
-				} else {
-					play();
-				}
-				break;
-			case next:
-				break;
-			case previous:
-				break;
-			default:
-				break;
-			}
-		};
-	};
+//	private Handler handler = new Handler() {
+//
+//		@Override
+//		public void handleMessage(Message msg) {
+//			switch (msg.what) {
+//			case play_pause:
+//				if(mMediaPlayer.isPlaying())
+//				{
+//					pause();
+//				} else {
+//					play();
+//				}
+//				break;
+//			case next:
+//				break;
+//			case previous:
+//				break;
+//			default:
+//				break;
+//			}
+//		};
+//	};
 	
 	public void pause() {
 		createOrUpdateBookmark();
-		if (this.boundEntities > 0) {
-			mediaPlayer.pause();
-		} else {
-			stopSelf();
-		}
+        mMediaPlayer.pause();
+        updateMediaSessionPlaybackState();
+        updateNotification();
 	}
 	
 	public void play() {
-		if(this.mediaPlayer != null) {
-			this.mediaPlayer.start();
+		if(this.mMediaPlayer != null) {
+			this.mMediaPlayer.start();
+            updateMediaSessionPlaybackState();
+            updateNotification();
 		}
 	}
 
-	public boolean isPlaying() {
-		if(this.mediaPlayer != null) {
-			return this.mediaPlayer.isPlaying();
-		} else {
-			return false;
-		}
-	}
+    private void updateNotification() {
+        mNotificationManager.notify(1333, generateNotification());
+    }
+
+    public boolean isPlaying() {
+        return this.mMediaPlayer != null && this.mMediaPlayer.isPlaying();
+    }
 	
 	public void previous() throws PlaylistFinishedException {
-		if(this.bean != null)
+		if(this.currentAudioBook != null)
 		{
-			this.bean.setPreviousTrack();
-			boolean wasPlaying = this.mediaPlayer.isPlaying();
+			this.currentAudioBook.setPreviousTrack();
+			boolean wasPlaying = this.mMediaPlayer.isPlaying();
 			prepareMediaplayerToCurrentTrack();
 			if(wasPlaying) play();
 		} else {
-			Log.e(TAG, "No valid audiobook bean available");
+			Log.e(TAG, "No valid currentAudioBook currentAudioBook available");
 		}
 	}
 	
 	public void next(boolean wasPlaying) throws PlaylistFinishedException {
-		if(this.bean != null)
+		if(this.currentAudioBook != null)
 		{
-			this.bean.setNextTrack();
+			this.currentAudioBook.setNextTrack();
 			prepareMediaplayerToCurrentTrack();
 			if(wasPlaying) play();
 		} else {
-			Log.e(TAG, "No valid audiobook bean available");
+			Log.e(TAG, "No valid currentAudioBook currentAudioBook available");
 		}
 	}
 	
-	private void initNotification(){
-		this.notification = new Notification.Builder(this)
-		.setWhen(System.currentTimeMillis())
-		.setSmallIcon(android.R.drawable.ic_media_play)
-		.getNotification();
-		
-		RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification_media_control);
-		this.notification.contentView = contentView;
-		this.notification.flags |= Notification.FLAG_ONGOING_EVENT;
-		this.notification.flags |= Notification.FLAG_NO_CLEAR;
-		
-		setListeners();
+	private Notification generateNotification(){
+
+        Notification.Action previous_action = new Notification.Action.Builder(R.drawable.ic_stat_av_skip_previous, "", PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_PREVIOUS), 0)).build();
+        Notification.Action pause_action = new Notification.Action.Builder(R.drawable.ic_stat_av_pause, "", PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_PLAY_PAUSE), 0)).build();
+        Notification.Action play_action = new Notification.Action.Builder(R.drawable.ic_stat_av_play_arrow, "", PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_PLAY_PAUSE), 0)).build();
+        Notification.Action next_action = new Notification.Action.Builder(R.drawable.ic_stat_av_skip_next, "", PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_NEXT), 0)).build();
+
+        return new Notification.Builder(this.getApplicationContext())
+				.setSmallIcon(android.R.drawable.ic_media_play)
+                .setContentTitle(this.currentAudioBook.getName())
+                .setContentText(this.currentAudioBook.getName() + " - " + this.currentAudioBook.getCurrentTrackName())
+                .setWhen(System.currentTimeMillis())  // the time stamp
+                .setDeleteIntent(PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_DISMISS), 0))
+                .setContentIntent(PendingIntent.getActivity(getApplicationContext(),1337, new Intent(getApplicationContext(),PlayActivity.class), 0))
+                .addAction(previous_action)
+                .addAction(isPlaying() ? pause_action : play_action)
+                .addAction(next_action)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setTicker(this.currentAudioBook.getName() + " - " + this.currentAudioBook.getCurrentTrackName())
+                .build();
+
+//		this.notification.flags |= Notification.FLAG_NO_CLEAR;
 	}
 	
 	private void toForeground() {
 		Log.e(TAG, "-- ToForeground --");
 		this.foreground = true;
-		setNotificationContents();
-		startForeground(1333, this.notification);
+		startForeground(1333, generateNotification());
 	}
 	
 	private void stopForeground() {
@@ -209,37 +284,13 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		stopForeground(true);
 	}
 
-	private void setNotificationContents() {
-		RemoteViews contentView = this.notification.contentView;
-		if(mediaPlayer.isPlaying()) {
-			contentView.setImageViewResource(R.id.notification_button_play, android.R.drawable.ic_media_pause);
-		} else {
-			contentView.setImageViewResource(R.id.notification_button_play, android.R.drawable.ic_media_play);
-		}
-//		contentView.setTextViewText(R.id.notification_current_track, this.bean.getCurrentTrackName());
-	}
-	
-	private void setListeners() {
-		RemoteViews contentView = this.notification.contentView;
-		
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_PLAY_PAUSE), 0);
-		contentView.setOnClickPendingIntent(R.id.notification_button_play, pendingIntent);
-		
-		PendingIntent pendingIntentNext = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_NEXT), 0);
-		contentView.setOnClickPendingIntent(R.id.notification_button_next, pendingIntentNext);
-		
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.setClass(getApplicationContext(), PlayActivity.class);
-		PendingIntent intentApplication = PendingIntent.getActivity(getApplicationContext(), 0, intent, Notification.FLAG_AUTO_CANCEL);
-		contentView.setOnClickPendingIntent(R.id.notification_cover, intentApplication);
-	}
-
 	@Override
 	public void onDestroy() {
 		Log.d(TAG, "-- onDestroy --");
 		unregisterReceiver(this.binder.getBroadcastHandler());
-		this.mediaPlayer.release();
-		this.mediaPlayer = null;
+		this.mMediaSession.release();
+		this.mMediaPlayer.release();
+		this.mMediaPlayer = null;
 		super.onDestroy();
 	}
 	
@@ -266,18 +317,18 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	}
 	
 	public int getCurrentPlaybackPosition() {
-		if(this.mediaPlayer != null)
+		if(this.mMediaPlayer != null)
 		{
-			return this.mediaPlayer.getCurrentPosition();
+			return this.mMediaPlayer.getCurrentPosition();
 		} else {
 			return 0;
 		}
 	}
 	
 	public int getDuration() {
-		if(this.mediaPlayer != null)
+		if(this.mMediaPlayer != null)
 		{
-			return this.mediaPlayer.getDuration();
+			return this.mMediaPlayer.getDuration();
 		} else {
 			return 0;
 		}
@@ -291,7 +342,7 @@ public class PlaybackService extends Service implements OnCompletionListener {
 		
 		if(this.boundEntities <= 0)
 		{
-			if(this.mediaPlayer.isPlaying()) {
+			if(this.mMediaPlayer.isPlaying()) {
 				toForeground();
 			} else {
 				stopSelf();
@@ -307,9 +358,9 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	}
 
 	public void seekTo(int progress) {
-		if(this.mediaPlayer != null && progress > 0 && progress < this.mediaPlayer.getDuration())
+		if(this.mMediaPlayer != null && progress > 0 && progress < this.mMediaPlayer.getDuration())
 		{
-			this.mediaPlayer.seekTo(progress);
+			this.mMediaPlayer.seekTo(progress);
 		}
 	}
 
@@ -320,14 +371,14 @@ public class PlaybackService extends Service implements OnCompletionListener {
 			next(true);
 		} catch (PlaylistFinishedException e) {
 			Log.d(TAG, "End of Playlist reached");
-//			this.bean.setCurrentTrack(0);
+//			this.currentAudioBook.setCurrentTrack(0);
 //			prepareMediaplayerToCurrentTrack();
 		}
 	}
 
 	public void setTrack(int trackNr) {
 		boolean wasPlaying = isPlaying();
-		this.bean.setCurrentTrack(trackNr);
+		this.currentAudioBook.setCurrentTrack(trackNr);
 		prepareMediaplayerToCurrentTrack();
 		if(wasPlaying) {
 			play();
@@ -336,22 +387,21 @@ public class PlaybackService extends Service implements OnCompletionListener {
 
 	private void createOrUpdateBookmark() {
 		Log.d(TAG, "storing current track and playback position");
-		if(this.bean.getBookmark() != null)
+		if(this.currentAudioBook.getBookmark() != null)
 		{
-			this.bean.getBookmark().setTrackNumber(this.bean.getCurrentTrack());
-			this.bean.getBookmark().setPlaybackPosition(this.mediaPlayer.getCurrentPosition());
+			this.currentAudioBook.getBookmark().setTrackNumber(this.currentAudioBook.getCurrentTrack());
+			this.currentAudioBook.getBookmark().setPlaybackPosition(this.mMediaPlayer.getCurrentPosition());
 		} else {
-			this.bean.setBookmark(new Bookmark(this.bean.getName(), this.bean.getCurrentTrack(), this.mediaPlayer.getCurrentPosition()));
+			this.currentAudioBook.setBookmark(new Bookmark(this.currentAudioBook.getName(), this.currentAudioBook.getCurrentTrack(), this.mMediaPlayer.getCurrentPosition()));
 		}
 		storeBookmark();
 	}
 
 	private void storeBookmark() {
-		DatabaseManager databaseManager = this.appContext.getDatabaseManager();
+		DatabaseManager databaseManager = this.mAppContext.getDatabaseManager();
 		if(databaseManager != null)
 		{
-			AsyncStoreBookmark storeBookmarkTask = new AsyncStoreBookmark(databaseManager);
-			storeBookmarkTask.doInBackground(this.bean.getBookmark());
+			new AsyncStoreBookmark(databaseManager).execute(this.currentAudioBook.getBookmark());
 		} else {
 			String string = getString(R.string.no_databasemanager);
 			Toast.makeText(getApplicationContext(), string, Toast.LENGTH_LONG).show();

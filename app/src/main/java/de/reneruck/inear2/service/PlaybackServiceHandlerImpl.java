@@ -5,6 +5,7 @@ import java.security.InvalidParameterException;
 import de.reneruck.inear2.PlaylistFinishedException;
 import de.reneruck.inear2.R;
 
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +15,7 @@ import android.widget.Toast;
 
 public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServiceHandler {
 
-	private static final String TAG = "InEar - PlaybackServiceHandler";
+	private static final String TAG = "PlaybackServiceHandler";
 
 	private PlaybackService service;
 	private BroadcastReceiver broadcastHandler;
@@ -33,28 +34,38 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-	
-			if (PlaybackService.ACTION_PLAY_PAUSE.equals(action)) {
-				Log.d(TAG, "Received Play pause action");
-				play_pause();
-			} else if (PlaybackService.ACTION_NEXT.equals(action)) {
-				Log.d(TAG, "Next Track called");
-				try {
-					next();
-				} catch (PlaylistFinishedException e) {
-					Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
-				}
-			} else if (PlaybackService.ACTION_PREVIOUS.equals(action)) {
-				Log.d(TAG, "Previous Track called");
-				try {
-					previous();
-				} catch (PlaylistFinishedException e) {
-					Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
-				}
-			} else if (PlaybackService.ACTION_SET_TRACK.equals(action)) {
-				Log.d(TAG, "Set Track called");
+
+			switch (action){
+				case PlaybackService.ACTION_PLAY_PAUSE:
+					Log.d(TAG, "Received Play pause action");
+					play_pause();
+					break;
+				case PlaybackService.ACTION_NEXT:
+					Log.d(TAG, "Next Track called");
+					try {
+						next();
+					} catch (PlaylistFinishedException e) {
+						Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
+					}
+					break;
+				case PlaybackService.ACTION_PREVIOUS:
+					Log.d(TAG, "Previous Track called");
+					try {
+						previous();
+					} catch (PlaylistFinishedException e) {
+						Toast.makeText(context, R.string.toast_audiobook_is_finished, Toast.LENGTH_SHORT).show();
+					}
+					break;
+				case PlaybackService.ACTION_SET_TRACK:
+					Log.d(TAG, "Set Track called");
 					int trackNr = intent.getIntExtra(PlaybackService.ACTION_SET_TRACK_NR, 0);
 					service.setTrack(trackNr);
+					break;
+				case PlaybackService.ACTION_DISMISS:
+					Log.d(TAG, "Dismiss Action");
+					play_pause();
+                    stopService();
+                    break;
 			}
 		}
 	}
@@ -78,7 +89,12 @@ public class PlaybackServiceHandlerImpl extends Binder implements PlaybackServic
 		this.service.previous();
 	}
 
-	@Override
+    @Override
+    public void stopService() {
+        service.stopSelf();
+    }
+
+    @Override
 	public boolean isPlaying() {
 		return this.service.isPlaying();
 	}
