@@ -63,8 +63,6 @@ public class PlaybackService extends Service implements OnCompletionListener {
         this.mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         this.binder = new PlaybackServiceHandlerImpl(this);
 
-//        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
         setupMediaSession();
         setCommandFilters();
 
