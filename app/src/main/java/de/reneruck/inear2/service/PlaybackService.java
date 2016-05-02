@@ -286,9 +286,10 @@ public class PlaybackService extends Service implements OnCompletionListener {
 	public void onDestroy() {
 		Log.d(TAG, "-- onDestroy --");
 		unregisterReceiver(this.binder.getBroadcastHandler());
-		this.mMediaSession.release();
-		this.mMediaPlayer.release();
-		this.mMediaPlayer = null;
+        this.mMediaSession.setActive(false);
+        this.mMediaSession.release();
+        this.mMediaPlayer.release();
+        this.mMediaPlayer = null;
 		super.onDestroy();
 	}
 	
