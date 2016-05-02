@@ -16,16 +16,15 @@ import de.reneruck.inear2.service.PlaybackService;
 public class PlaylistFragment extends ListFragment implements PropertyChangeListener{
 	
 	private AppContext appContext;
-	private List<String> currentPlaylist;
 	private PlaylistAdapter listAdapter;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.appContext = (AppContext) getActivity().getApplicationContext();
-		this.appContext.getCurrentAudiobookBean().addPropertyChangeListener(this);
+		this.appContext.getCurrentAudiobook().addPropertyChangeListener(this);
 
-		this.currentPlaylist = this.appContext.getCurrentAudiobookBean().getPlaylist();
+		List<String> currentPlaylist = this.appContext.getCurrentAudiobook().getPlaylist();
 		this.listAdapter = new PlaylistAdapter(getActivity(), R.layout.playlist_entry, currentPlaylist);
 		setListAdapter(this.listAdapter);
 	}
@@ -39,7 +38,7 @@ public class PlaylistFragment extends ListFragment implements PropertyChangeList
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		getListView().setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
+		getListView().setSelection(this.appContext.getCurrentAudiobook().getCurrentTrack());
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class PlaylistFragment extends ListFragment implements PropertyChangeList
 			if(getListView() != null)
 			{
 				this.listAdapter.notifyDataSetChanged();
-				getListView().setSelection(this.appContext.getCurrentAudiobookBean().getCurrentTrack());
+				getListView().setSelection(this.appContext.getCurrentAudiobook().getCurrentTrack());
 			}
 		}
 	}

@@ -40,7 +40,8 @@ public class PlayActivity extends Activity{
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        this.setTitle(this.appContext.getCurrentAudiobookBean().getName());
+
+        this.setTitle(this.appContext.getCurrentAudiobook().getName());
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class PlayActivity extends Activity{
     	ImageView bottonPlay = (ImageView) findViewById(R.id.button_play);
     	bottonPlay.setOnClickListener(this.playButtonClickListener);
 
-    	setPlaybackControlIcon();
+    	setPlaybackControllIcon();
 
     	ImageView bottonPrev = (ImageView) findViewById(R.id.button_prev);
     	bottonPrev.setOnClickListener(this.prevButtonClickListener);
@@ -164,12 +165,12 @@ public class PlayActivity extends Activity{
 		@Override
 		public void onClick(View v) {
 			playbackServiceHandler.play_pause();
-			setPlaybackControlIcon();
+			setPlaybackControllIcon();
 		}
 
 	};
 	
-	private void setPlaybackControlIcon() {
+	private void setPlaybackControllIcon() {
 		if (this.playbackServiceHandler.isPlaying()) {
 			((ImageView) findViewById(R.id.button_play)).setImageResource(R.drawable.ic_play_stop);
 		} else {

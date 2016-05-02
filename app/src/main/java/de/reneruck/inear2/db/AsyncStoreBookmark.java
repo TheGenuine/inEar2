@@ -23,7 +23,7 @@ public class AsyncStoreBookmark extends AsyncTask<Bookmark, Void, Void> {
 			SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
 			
 			ContentValues values = new ContentValues(3);
-			values.put(DbConfigs.FIELD_AUDIOBOOK_NAME, bookmarkToStore.getBookTitle());
+			values.put(DbConfigs.FIELD_BOOK_NAME, bookmarkToStore.getBookTitle());
 			values.put(DbConfigs.FIELD_TRACK, bookmarkToStore.getTrackNumber());
 			values.put(DbConfigs.FIELD_PLAYBACK_POS, bookmarkToStore.getPlaybackPosition());
 			if(!bookmarkExists(writableDatabase, bookmarkToStore.getBookTitle()))
@@ -39,8 +39,8 @@ public class AsyncStoreBookmark extends AsyncTask<Bookmark, Void, Void> {
 	}
 
 	private boolean bookmarkExists(SQLiteDatabase db, String bookName) {
-		Cursor c = db.query(DbConfigs.TABLE_BOOKMARKS, new String[]{"*"}, DbConfigs.FIELD_AUDIOBOOK_NAME + " like '" + bookName + "'", null, null, null,null);
-		boolean result = c.getCount() > 0 ? true : false;
+		Cursor c = db.query(DbConfigs.TABLE_BOOKMARKS, new String[]{"*"}, DbConfigs.FIELD_BOOK_NAME + " like '" + bookName + "'", null, null, null,null);
+		boolean result = c.getCount() > 0;
 		c.close();
 		return result;
 	}

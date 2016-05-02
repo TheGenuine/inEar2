@@ -15,13 +15,13 @@ import android.widget.TextView;
 public class AudiobookListAdapter extends BaseAdapter {
 
 	private Activity mActivity;
-	private ArrayList<String> mData;
+	private ArrayList<AudioBook> mData;
 
 	private static LayoutInflater inflater = null;
 
-	public AudiobookListAdapter(Activity activity, List<String> list) {
+	public AudiobookListAdapter(Activity activity, List<AudioBook> list) {
 		mActivity = activity;
-		mData = new ArrayList<String>(list);
+		mData = new ArrayList<>(list);
 		inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
@@ -48,9 +48,9 @@ public class AudiobookListAdapter extends BaseAdapter {
 		TextView artist = (TextView) vi.findViewById(R.id.artist); // artist
 																	// name
 		TextView duration = (TextView) vi.findViewById(R.id.duration); // duration
-		ImageView thumb_image = (ImageView) vi.findViewById(R.id.list_image); 
+		ImageView thumb_image = (ImageView) vi.findViewById(R.id.list_image);
 
-		String audiobook = mData.get(position);
+		String audiobook = mData.get(position).getName();
 
 		String[] split = audiobook.split("-");
 		

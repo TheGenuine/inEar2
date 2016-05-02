@@ -1,5 +1,6 @@
 package de.reneruck.inear2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ActivityManager;
@@ -11,7 +12,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.reneruck.inear2.db.DatabaseManager;
-import de.reneruck.inear2.file.FileScanner;
 import de.reneruck.inear2.service.PlaybackService;
 
 
@@ -23,8 +23,8 @@ public class AppContext extends Application {
 
 	private DatabaseManager databaseManager;
 	private Settings settings;
-	private CurrentAudiobook currentAudiobookBean;
-	private AudiobookBeanFactory audiobookBeanFactory;
+	private AudioBook mCurrentAudioBook;
+	private List<AudioBook> availableAudioBooks = new ArrayList<>();
 
 	@Override
 	public void onCreate() {
@@ -34,18 +34,13 @@ public class AppContext extends Application {
 		
 		readSettings();
 		registerForPreferenceChange();
-		initAudiobookBeanFactory();
 	}
 	
-	private void initAudiobookBeanFactory() {
-		this.audiobookBeanFactory = new AudiobookBeanFactory(this.audiobookBaseDir, this.databaseManager);
-	}
-
 	public void readSettings() {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		this.audiobookBaseDir = sharedPref.getString("pref_base_dir", getString(R.string.pref_base_dir_default));
 		this.settings = new Settings(sharedPref);
-		runFilescanner();
+//		runFilescanner();
 	}
 
 	private void registerForPreferenceChange() {
@@ -56,7 +51,7 @@ public class AppContext extends Application {
 			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 				if("pref_base_dir".equals(key)) {
 					audiobookBaseDir = sharedPreferences.getString("pref_base_dir", getString(R.string.pref_base_dir_default));
-					runFilescanner();
+//					runFilescanner();
 				}
 				if("pref_autoplay".equals(key)) {
 					settings.setAutoplay(sharedPreferences.getBoolean("pref_autoplay", false));
@@ -68,26 +63,14 @@ public class AppContext extends Application {
 		});
 	}
 	
-	private void runFilescanner() {
-		FileScanner fileScanner = new FileScanner(this);
-		fileScanner.doInBackground();
-	}
-	
-	public void setCurrentAudiobook(String currentAudiobook) {
-		if(this.currentAudiobookBean == null || !this.currentAudiobookBean.getName().equals(currentAudiobook))
+	public void setCurrentAudiobook(AudioBook currentAudioBook) {
+		if(this.mCurrentAudioBook == null || !this.mCurrentAudioBook.equals(currentAudioBook))
 		{
-			this.currentAudiobookBean = this.audiobookBeanFactory.getAudiobookBeanForName(currentAudiobook);
+			this.mCurrentAudioBook = currentAudioBook;
+			this.mCurrentAudioBook.loadStoredBookmark();
 		} else {
-			Log.d(TAG, currentAudiobook + " already loaded, nothing to do");
+			Log.d(TAG, currentAudioBook.getName() + " already loaded, nothing to do");
 		}
-	}
-	
-	public void setCurrentAudiobook(CurrentAudiobook currentAudiobook) {
-		this.currentAudiobookBean = currentAudiobook;
-	}
-
-	public String getAudiobokkBaseDir() {
-		return this.audiobookBaseDir;
 	}
 
 	public DatabaseManager getDatabaseManager() {
@@ -97,12 +80,9 @@ public class AppContext extends Application {
 	public void setDatabaseManager(DatabaseManager databaseManager) {
 		this.databaseManager = databaseManager;
 	}
-	public CurrentAudiobook getCurrentAudiobookBean() {
-		return currentAudiobookBean;
-	}
 
-	public void setCurrentAudiobookBean(CurrentAudiobook currentAudiobookBean) {
-		this.currentAudiobookBean = currentAudiobookBean;
+	public AudioBook getCurrentAudiobook() {
+		return mCurrentAudioBook;
 	}
 
 	public Settings getSettings() {
@@ -124,4 +104,20 @@ public class AppContext extends Application {
         }
         return false;
      }
+
+	public void setAudiobookBaseDir(String audiobookBaseDir) {
+		this.audiobookBaseDir = audiobookBaseDir;
+	}
+
+	public String getAudiobookBaseDir() {
+		return this.audiobookBaseDir;
+	}
+
+	public List<AudioBook> getAvailableAudioBooks() {
+		return availableAudioBooks;
+	}
+
+	public void setAvailableAudioBooks(List<AudioBook> availableAudioBooks) {
+		this.availableAudioBooks = availableAudioBooks;
+	}
 }

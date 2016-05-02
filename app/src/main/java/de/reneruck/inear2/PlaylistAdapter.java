@@ -66,7 +66,7 @@ public class PlaylistAdapter extends BaseAdapter {
 			text.setBackgroundColor(Color.TRANSPARENT);
 			text.setText(getItemText(item));
 			
-			int currentTrack = ((AppContext)this.mContext.getApplicationContext()).getCurrentAudiobookBean().getCurrentTrack();
+			int currentTrack = ((AppContext)this.mContext.getApplicationContext()).getCurrentAudiobook().getCurrentTrack();
 			if(currentTrack == position)
 			{
 //				text.setTypeface(null,Typeface.BOLD);
