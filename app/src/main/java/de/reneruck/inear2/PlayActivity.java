@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+
+import de.reneruck.inear2.exceptions.PlaylistFinishedException;
 import de.reneruck.inear2.service.PlaybackService;
 import de.reneruck.inear2.service.PlaybackServiceHandler;
 
@@ -39,7 +41,9 @@ public class PlayActivity extends Activity{
         this.appContext = (AppContext) getApplicationContext();
 
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         this.setTitle(this.appContext.getCurrentAudiobook().getName());
 	}
