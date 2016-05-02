@@ -255,12 +255,12 @@ public class PlaybackService extends Service implements OnCompletionListener {
         Notification.Action next_action = new Notification.Action.Builder(R.drawable.ic_stat_av_skip_next, "", PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_NEXT), 0)).build();
 
         return new Notification.Builder(this.getApplicationContext())
-				.setSmallIcon(android.R.drawable.ic_media_play)
+				.setSmallIcon(isPlaying() ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause)
                 .setContentTitle(this.currentAudioBook.getName())
                 .setContentText(this.currentAudioBook.getName() + " - " + this.currentAudioBook.getCurrentTrackName())
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setDeleteIntent(PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(ACTION_DISMISS), 0))
-                .setContentIntent(PendingIntent.getActivity(getApplicationContext(),1337, new Intent(getApplicationContext(),PlayActivity.class), 0))
+                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, new Intent(getApplicationContext(),PlayActivity.class), 0))
                 .addAction(previous_action)
                 .addAction(isPlaying() ? pause_action : play_action)
                 .addAction(next_action)
