@@ -7,11 +7,10 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical" 
-        android:gravity="center_vertical|center_horizontal" 
-        android:paddingLeft="5dip"
-        android:paddingRight="10dip">
-    
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
         <ImageView
             android:id="@+id/notification_cover"
             android:layout_width="wrap_content"
@@ -19,40 +18,62 @@
             android:fadingEdgeLength="5dip"
             android:singleLine="true"
             android:src="@drawable/ic_launcher" />
-        
+
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="10dip">
+        android:orientation="horizontal"
+        android:padding="20dip"
+        android:gravity="center">
 
-<!--         <TextView -->
-<!--             android:id="@+id/notification_current_track" -->
-<!--             android:layout_width="wrap_content" -->
-<!--             android:layout_height="wrap_content" -->
-<!--             android:text="current Track"  -->
-<!--             android:layout_weight="1"/> -->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <!--<TextView-->
+                <!--android:id="@+id/notification_current_track"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="current Track"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textStyle="bold" />-->
+            <ImageView
+                android:id="@+id/notification_button_prev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:rotation="180.0"
+                android:src="@drawable/ic_stat_av_skip_previous"
+                android:padding="15dp"
+                />
 
             <ImageView
                 android:id="@+id/notification_button_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_pause" />
+                android:src="@drawable/ic_stat_av_play_arrow"
+                android:padding="15dp"
+                />
 
             <ImageView
                 android:id="@+id/notification_button_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_next" />
-            
-        </LinearLayout>
-        
+                android:src="@drawable/ic_stat_av_skip_next"
+                android:padding="15dp"
+               />
+
+
+
     </LinearLayout>
-    
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="end">-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/notification_button_dismiss"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/ic_stat_navigation_close"-->
+            <!--android:padding="20dp"/>-->
+    <!--</LinearLayout>-->
 </LinearLayout>
